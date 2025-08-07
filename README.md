@@ -98,6 +98,9 @@ vm1.establish_p2p_with(vm2)
 vm1.broadcast("Hello network!")
 ```
 
+example usage
+
+
 ```python
 from pylua_vm import VMManager
 
