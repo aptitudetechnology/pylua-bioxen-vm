@@ -1,7 +1,7 @@
 # test_installation_fixed.py
 from pylua_vm import VMManager, create_vm
 
-print("Testing py-lua-vm installation...")
+print("Testing pylua_vm installation...")
 
 # Test basic VM creation
 try:
