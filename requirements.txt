@@ -1,0 +1,13 @@
+# Core dependencies for py-lua-vm
+# No Python dependencies required - uses only standard library
+
+# Development dependencies (install with: pip install -r requirements-dev.txt)
+# pytest>=6.0
+# pytest-asyncio
+# black
+# flake8
+# mypy
+
+# System dependencies (install separately):
+# - lua (Lua interpreter)
+# - luasocket (via luarocks: luarocks install luasocket)
