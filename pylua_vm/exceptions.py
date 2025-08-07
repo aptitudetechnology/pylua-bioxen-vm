@@ -1,5 +1,5 @@
 """
-Custom exceptions for py-lua-vm library.
+Custom exceptions for pylua-bioxen-vm library.
 """
 
 class LuaVMError(Exception):

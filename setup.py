@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Minimal setup.py for py-lua-vm.
+Minimal setup.py for pylua-bioxen-vm.
 All configuration is in setup.cfg.
 """
 

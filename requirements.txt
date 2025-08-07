@@ -1,4 +1,4 @@
-# Core dependencies for py-lua-vm
+# Core dependencies for pylua-bioxen-vm
 # No Python dependencies required - uses only standard library
 
 # Development dependencies (install with: pip install -r requirements-dev.txt)
