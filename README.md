@@ -98,6 +98,23 @@ vm1.establish_p2p_with(vm2)
 vm1.broadcast("Hello network!")
 ```
 
+```python
+from pylua_vm import VMManager
+
+with VMManager() as manager:
+    # Server VM
+    server_vm = manager.create_vm("server", networked=True)
+    server_future = manager.start_server_vm("server", port=8080)
+    
+    # Client VM  
+    client_vm = manager.create_vm("client", networked=True)
+    client_future = manager.start_client_vm("client", "localhost", 8080, "Hello!")
+    
+    # P2P VM
+    p2p_vm = manager.create_vm("p2p", networked=True)
+    p2p_future = manager.start_p2p_vm("p2p", 8081, "localhost", 8080)
+```
+
 ## Examples
 
 See the `examples/` directory for:
