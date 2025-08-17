@@ -25,6 +25,7 @@ Build a minimum viable prototype of a software-defined air quality monitoring sy
 - Display real-time air quality data in formatted console output
 - Monitor system health and VM status
 - Allow user to start/stop monitoring processes
+- View real-time status with rich
 
 **Menu System Requirements:**
 - Main menu with options: View Current Data, System Status, Start/Stop Monitoring, Exit
