@@ -8,13 +8,15 @@ from pylua_vm.exceptions import (
     SessionNotFoundError, SessionAlreadyExistsError, 
     VMManagerError, ProcessRegistryError
 )
-print("✅ Modules imported successfully")
+
 try:
     _ = SessionManager
     SESSION_MANAGER_AVAILABLE = True
+    print("✅ Modules imported successfully")
     print("✅ SessionManager available")
 except NameError:
     SESSION_MANAGER_AVAILABLE = False
+    print("✅ Modules imported successfully")
     print("⚠️ SessionManager not available")
 
 import time
