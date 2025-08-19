@@ -73,24 +73,33 @@ except Exception as e:
 print("\n4. Testing Async Execution")
 try:
     with VMManager() as manager:
+        print(f"[DEBUG] VMManager object: {manager}")
         vm = manager.create_vm("async_vm")
+        print(f"[DEBUG] Async VM object: {vm}")
         future = manager.execute_vm_async("async_vm", 'print("Async execution works!")')
+        print(f"[DEBUG] Future object: {future}")
         result = future.result()
+        print(f"[DEBUG] Async execution result: {result}")
         print("✅ Async VM:", result['stdout'])
 except Exception as e:
     print("❌ Async VM failed:", e)
+    traceback.print_exc()
 
 
 
 print("\n5. Testing Interactive Session Lifecycle")
 try:
     manager = VMManager()
+    print(f"[DEBUG] VMManager object: {manager}")
     vm_id = "interactive_test_vm"
     # Cleanup any existing VM
-    try: manager.terminate_vm_session(vm_id)
-    except: pass
+    try:
+        manager.terminate_vm_session(vm_id)
+        print(f"[DEBUG] Terminated any existing VM session for {vm_id}")
+    except Exception as cleanup_e:
+        print(f"[DEBUG] Cleanup exception: {cleanup_e}")
     session = manager.create_interactive_vm(vm_id)
-    # print("✅ Interactive VM created")
+    print(f"[DEBUG] Interactive session object: {session}")
     manager.send_input(vm_id, "x = 42\n")
     manager.send_input(vm_id, "print('The answer is:', x)\n")
     time.sleep(0.5)
@@ -114,6 +123,7 @@ try:
     print("✅ Session terminated")
 except Exception as e:
     print("❌ Interactive Session failed:", e)
+    traceback.print_exc()
 
 
 print("\n6. Testing Session Manager")
