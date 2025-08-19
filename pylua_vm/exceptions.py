@@ -21,6 +21,11 @@ class LuaNotFoundError(LuaVMError):
     """Raised when the Lua interpreter is not found."""
     pass
 
+
+class PTYError(LuaVMError):
+    """Raised when there's an error with PTY (pseudo-terminal) operations."""
+    pass
+
 class LuaSocketNotFoundError(LuaVMError):
     """Raised when LuaSocket is not available."""
     pass
