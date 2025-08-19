@@ -29,6 +29,21 @@ class InteractiveSessionError(LuaVMError):
     """Raised when an interactive session fails or encounters an error."""
     pass
 
+    class SessionNotFoundError(InteractiveSessionError):
+        """Raised when trying to access a session that doesn't exist."""
+        pass
+
+    class SessionAlreadyExistsError(InteractiveSessionError):
+        """Raised when trying to create a session with an ID that already exists."""
+        pass
+
+    class VMManagerError(LuaVMError):
+        """Raised when there's an error with VM manager operations."""
+        pass
+
+    class ProcessRegistryError(VMManagerError):
+        """Raised when there's an error with the persistent VM registry."""
+        pass
 class AttachError(InteractiveSessionError):
     """Raised when attaching to an interactive session fails."""
     pass
