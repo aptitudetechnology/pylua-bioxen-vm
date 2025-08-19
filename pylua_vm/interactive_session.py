@@ -111,6 +111,9 @@ class InteractiveSession:
     def send_command(self, command: str):
         if not self._running:
             raise InteractiveSessionError("Session not running")
+        # Buffer multi-line Lua code and send as a block
+        if isinstance(command, list):
+            command = "\n".join(command)
         if not command.endswith("\n"):
             command += "\n"
         os.write(self.master_fd, command.encode())
