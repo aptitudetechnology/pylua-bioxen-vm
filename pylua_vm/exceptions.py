@@ -1,4 +1,3 @@
-test_installation.py
 from pylua_vm import VMManager, create_vm, InteractiveSession, SessionManager
 from pylua_vm import (
     InteractiveSessionError, AttachError, DetachError, 
