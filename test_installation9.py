@@ -74,7 +74,6 @@ try:
     net_vm = create_vm("net_vm", networked=True)
     print("✅ Networked VM created successfully")
 except Exception as e:
-except Exception as e:
     print("❌ Networked VM failed:", e)
 
 # === 3. VM Manager - Synchronous ===
