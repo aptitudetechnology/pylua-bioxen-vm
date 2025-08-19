@@ -77,10 +77,8 @@ except Exception as e:
 
 
 
-# === 5. Interactive Session Lifecycle ===
 print("\n5. Testing Interactive Session Lifecycle")
 try:
-    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "interactive_test_vm"
     # Cleanup any existing VM
@@ -110,10 +108,8 @@ except Exception as e:
     print("❌ Interactive Session failed:", e)
 
 
-# === 6. Session Manager Operations ===
 print("\n6. Testing Session Manager")
 try:
-    from pylua_vm import SessionManager, VMManager
     session_manager = SessionManager()
     sessions = session_manager.list_sessions()
     print(f"✅ Active sessions: {len(sessions)}, {sessions!r}")
@@ -187,10 +183,8 @@ else:
     except Exception as e: print("❌ Registry operations failed:", e)
 
 
-# === 9. Complex Interactive Session ===
 print("\n9. Testing Complex Interactive Session")
 try:
-    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "complex_session"
     try: manager.terminate_vm_session(vm_id)
@@ -217,10 +211,8 @@ for i=1,5 do print('Count:', i) end
 except Exception as e: print("❌ Complex session failed:", e)
 
 
-# === 10. Session Reattachment ===
 print("\n10. Testing Session Reattachment")
 try:
-    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "reattach_test"
     try: manager.terminate_vm_session(vm_id)
