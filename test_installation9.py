@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 print("Testing pylua-bioxen-vm installation...")
 print("=" * 50)
@@ -71,6 +74,7 @@ try:
     net_vm = create_vm("net_vm", networked=True)
     print("✅ Networked VM created successfully")
 except Exception as e:
+except Exception as e:
     print("❌ Networked VM failed:", e)
 
 # === 3. VM Manager - Synchronous ===
@@ -136,7 +140,6 @@ print("\n6. Testing Session Manager")
 try:
     import importlib
     VMManager = importlib.import_module('pylua_vm').VMManager
-    SessionManager = importlib.import_module('pylua_vm').SessionManager
     session_manager = SessionManager()
     sessions = session_manager.list_sessions()
     print(f"✅ Active sessions: {len(sessions)}, {sessions!r}")
