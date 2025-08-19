@@ -91,7 +91,10 @@ class InteractiveSession:
             self._output_callback = output_callback
 
     def detach(self):
+        from .exceptions import DetachError
         with self._lock:
+            if not self._attached:
+                raise DetachError("Session is not currently attached")
             self._attached = False
             self._output_callback = None
 
