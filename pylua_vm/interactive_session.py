@@ -63,6 +63,7 @@ class InteractiveSession:
             raise InteractiveSessionError(f"Failed to start session: {e}")
 
     def _read_output(self):
+        self._banner_filtered = False
         while self._running:
             try:
                 rlist, _, _ = select.select([self.master_fd], [], [], 0.1)
@@ -70,6 +71,12 @@ class InteractiveSession:
                     data = os.read(self.master_fd, 1024)
                     if data:
                         output = data.decode(errors="replace")
+                        # Filter out Lua banner/version info on first output
+                        if not self._banner_filtered:
+                            if output.strip().startswith('Lua '):
+                                self._banner_filtered = True
+                                continue  # skip banner
+                            self._banner_filtered = True
                         self._last_activity = time.time()
                         self.output_queue.put(output)
                         if self._waiting_for_command:
