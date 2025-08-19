@@ -202,6 +202,16 @@ class SessionManager:
                 for sid, session in self._sessions.items()
             }
 
+    def terminate_session(self, session_id: str) -> None:
+        """
+        Terminate a specific session by its ID.
+        """
+        with self._lock:
+            session = self._sessions.get(session_id)
+            if session:
+                session.terminate()
+                self._sessions.pop(session_id, None)
+
     def cleanup_all(self):
         with self._lock:
             for session in list(self._sessions.values()):
