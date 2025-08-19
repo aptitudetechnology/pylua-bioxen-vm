@@ -63,7 +63,7 @@ try:
     print("✅ Interactive VM created")
     
     # Send commands and read output
-    manager.send_input(vm_id "x = 42\n")
+    manager.send_input(vm_id, "x = 42\n")
     manager.send_input(vm_id, "print('The answer is:', x)\n")
     time.sleep(0.2)  # Increased for stability
     output = manager.read_output(vm_id)
