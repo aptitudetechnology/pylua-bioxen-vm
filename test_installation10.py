@@ -34,9 +34,8 @@ def check_output_contains(output, expected_parts, test_name=""):
     missing_parts = []
     
     for part in expected_parts:
-        # Handle both tabs and spaces in expected output
-        part_flexible = re.sub(r':\s+', r':\s*', part)  # Allow any whitespace after colons
-        if not re.search(part_flexible, output_clean):
+        # Simple substring search - much more reliable
+        if part not in output_clean:
             missing_parts.append(part)
     
     if missing_parts:
