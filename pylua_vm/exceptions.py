@@ -1,9 +1,9 @@
-from pylua_vm import VMManager, create_vm, InteractiveSession, SessionManager
-from pylua_vm import (
-    InteractiveSessionError, AttachError, DetachError, 
-    SessionNotFoundError, SessionAlreadyExistsError, 
-    VMManagerError, ProcessRegistryError
-)
+## from pylua_vm import VMManager, create_vm, InteractiveSession, SessionManager  # Commented out to prevent circular import
+## from pylua_vm import (
+##     InteractiveSessionError, AttachError, DetachError, 
+##     SessionNotFoundError, SessionAlreadyExistsError, 
+##     VMManagerError, ProcessRegistryError
+## )
 import time
 
 print("Testing pylua-bioxen-vm installation...")
