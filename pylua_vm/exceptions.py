@@ -1,45 +1,69 @@
-import time
+"""
+Custom exceptions for pylua-bioxen-vm library.
+"""
 
-print("Testing pylua-bioxen-vm installation...")
-print("=" * 50)
+class LuaVMError(Exception):
+    """Base exception for all Lua VM related errors."""
+    pass
 
-# Test 1: Basic VM Creation and Execution (Legacy)
-print("\n1. Testing Basic VM Creation and Execution")
-try:
-    vm = create_vm("test_vm")
-    result = vm.execute_string('print("Hello from Lua!")')
-    print("✅ Basic VM:", result['stdout'])
-except Exception as e:
-    print("❌ Basic VM failed:", e)
+class LuaProcessError(LuaVMError):
+    """Raised when there's an error with Lua subprocess execution."""
+    def __init__(self, message, return_code=None, stderr=None):
+        super().__init__(message)
+        self.return_code = return_code
+        self.stderr = stderr
 
-# Test 2: Networked VM (Legacy)
-print("\n2. Testing Networked VM")
-try:
-    net_vm = create_vm("net_vm", networked=True)
-    print("✅ Networked VM created successfully")
-except Exception as e:
-    print("❌ Networked VM failed:", e)
+class NetworkingError(LuaVMError):
+    """Raised for networking-related errors in Lua VMs."""
+    pass
 
-# Test 3: VM Manager - Synchronous Execution (Legacy)
-print("\n3. Testing VM Manager - Synchronous")
-try:
-    with VMManager() as manager:
-        vm = manager.create_vm("managed_vm")
-        result = manager.execute_vm_sync("managed_vm", 'print("Square root of 16 is:", math.sqrt(16))')
-        print("✅ VM Manager Sync:", result['stdout'])
-except Exception as e:
-    print("❌ VM Manager Sync failed:", e)
+class LuaNotFoundError(LuaVMError):
+    """Raised when the Lua interpreter is not found."""
+    pass
 
-# Test 4: Async Execution (Legacy)
-print("\n4. Testing Async Execution")
-try:
-    with VMManager() as manager:
-        vm = manager.create_vm("async_vm")
-        future = manager.execute_vm_async("async_vm", 'print("Async execution works!")')
-        result = future.result()  # Wait for completion
-        print("✅ Async VM:", result['stdout'])
-except Exception as e:
-    print("❌ Async VM failed:", e)
+class LuaSocketNotFoundError(LuaVMError):
+    """Raised when LuaSocket is not available."""
+    pass
+
+class VMConnectionError(LuaVMError):
+    """Raised when a VM connection fails."""
+    pass
+
+class VMTimeoutError(LuaVMError):
+    """Raised when a VM operation times out."""
+    pass
+
+class ScriptGenerationError(LuaVMError):
+    """Raised when there's an error generating dynamic Lua scripts."""
+    pass
+
+class InteractiveSessionError(LuaVMError):
+    """Raised for errors in interactive session management."""
+    pass
+
+class AttachError(InteractiveSessionError):
+    """Raised when attaching to a session fails."""
+    pass
+
+class DetachError(InteractiveSessionError):
+    """Raised when detaching from a session fails."""
+    pass
+
+class SessionNotFoundError(InteractiveSessionError):
+    """Raised when trying to access a session that doesn't exist."""
+    pass
+
+class SessionAlreadyExistsError(InteractiveSessionError):
+    """Raised when trying to create a session with an ID that already exists."""
+    pass
+
+class VMManagerError(LuaVMError):
+    """Raised when there's an error with VM manager operations."""
+    pass
+
+class ProcessRegistryError(VMManagerError):
+    """Raised when there's an error with the persistent VM registry."""
+    pass
 
 # Test 5: Interactive Session Lifecycle
 print("\n5. Testing Interactive Session Lifecycle")
