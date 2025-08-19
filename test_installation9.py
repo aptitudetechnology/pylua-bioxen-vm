@@ -112,7 +112,7 @@ try:
     try: manager.terminate_vm_session(vm_id)
     except: pass
     session = manager.create_interactive_vm(vm_id)
-    print("✅ Interactive VM created")
+    # print("✅ Interactive VM created")
     manager.send_input(vm_id, "x = 42\n")
     manager.send_input(vm_id, "print('The answer is:', x)\n")
     time.sleep(0.5)
