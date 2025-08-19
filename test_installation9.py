@@ -2,6 +2,11 @@ import sys, os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from pylua_vm import VMManager, SessionManager, create_vm, InteractiveSession
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 print("Testing pylua-bioxen-vm installation...")
 print("=" * 50)
 
