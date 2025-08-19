@@ -1,4 +1,3 @@
-
 """
 InteractiveSession: Persistent interactive Lua VM session with PTY and threading support.
 SessionManager: Tracks and manages multiple InteractiveSession instances for VMManager integration.
@@ -71,6 +70,7 @@ class InteractiveSession:
                     data = os.read(self.master_fd, 1024)
                     if data:
                         output = data.decode(errors="replace")
+                        print(f"[DEBUG][_read_output] PTY output: {output!r}")
                         # Filter out Lua banner/version info on first output
                         if not self._banner_filtered:
                             if output.strip().startswith('Lua '):
@@ -118,12 +118,36 @@ class InteractiveSession:
             command += "\n"
         os.write(self.master_fd, command.encode())
         self._last_activity = time.time()
+        # Force flush: read all available output after sending command
+        time.sleep(0.1)
+        try:
+            while True:
+                rlist, _, _ = select.select([self.master_fd], [], [], 0.05)
+                if self.master_fd in rlist:
+                    data = os.read(self.master_fd, 1024)
+                    if data:
+                        output = data.decode(errors="replace")
+                        print(f"[DEBUG][PTY] Output after send_command: {output!r}")
+                        self.output_queue.put(output)
+                    else:
+                        break
+                else:
+                    break
+        except Exception as e:
+            print(f"[DEBUG][PTY] Error during flush: {e}")
 
     def read_output(self, timeout: float = 0.1) -> Optional[str]:
+        # Drain all output in the queue and concatenate
+        outputs = []
         try:
-            return self.output_queue.get(timeout=timeout)
+            while True:
+                output = self.output_queue.get(timeout=timeout)
+                outputs.append(output)
         except queue.Empty:
-            return None
+            pass
+        result = "".join(outputs)
+        print(f"[DEBUG][read_output] Drained output: {result!r}")
+        return result if result else None
 
     def execute_and_wait(self, command: str, timeout: float = 5.0) -> str:
         self._waiting_for_command = True
