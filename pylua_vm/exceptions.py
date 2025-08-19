@@ -59,6 +59,11 @@ class SessionNotFoundError(InteractiveSessionError):
     pass
 
 
+
+class IOThreadError(InteractiveSessionError):
+    """Raised when there's an error with I/O threading operations."""
+    pass
+
 class SessionStateError(InteractiveSessionError):
     """Raised when there's an error with session state management."""
     pass
