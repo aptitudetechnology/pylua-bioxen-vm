@@ -3,7 +3,9 @@ print("Testing pylua-bioxen-vm installation...")
 print("=" * 50)
 
 
-# === Top-level imports with robust fallback ===
+
+# === Top-level imports with robust fallback and global assignment ===
+import sys, os
 try:
     from pylua_vm import VMManager, SessionManager, create_vm, InteractiveSession
     from pylua_vm.exceptions import (
@@ -14,8 +16,6 @@ try:
     print("✅ Modules imported successfully")
 except ImportError as e:
     print("❌ Module import failed:", e)
-    # Fallback: add current and parent directory to sys.path and retry
-    import sys, os
     sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     try:
@@ -29,6 +29,10 @@ except ImportError as e:
     except ImportError as e2:
         print("❌ Fallback import failed:", e2)
         exit(1)
+
+# Ensure VMManager and SessionManager are available globally
+globals()['VMManager'] = VMManager
+globals()['SessionManager'] = SessionManager
 
 # Check if SessionManager is available
 try:
@@ -94,6 +98,7 @@ except Exception as e:
 
 print("\n5. Testing Interactive Session Lifecycle")
 try:
+    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "interactive_test_vm"
     # Cleanup any existing VM
@@ -128,6 +133,7 @@ except Exception as e:
 
 print("\n6. Testing Session Manager")
 try:
+    from pylua_vm import SessionManager, VMManager
     session_manager = SessionManager()
     sessions = session_manager.list_sessions()
     print(f"✅ Active sessions: {len(sessions)}, {sessions!r}")
@@ -203,6 +209,7 @@ else:
 
 print("\n9. Testing Complex Interactive Session")
 try:
+    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "complex_session"
     try: manager.terminate_vm_session(vm_id)
@@ -235,6 +242,7 @@ except Exception as e: print("❌ Complex session failed:", e)
 
 print("\n10. Testing Session Reattachment")
 try:
+    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "reattach_test"
     try: manager.terminate_vm_session(vm_id)
