@@ -58,6 +58,11 @@ class SessionNotFoundError(InteractiveSessionError):
     """Raised when trying to access a session that doesn't exist."""
     pass
 
+
+class SessionStateError(InteractiveSessionError):
+    """Raised when there's an error with session state management."""
+    pass
+
 class SessionAlreadyExistsError(InteractiveSessionError):
     """Raised when trying to create a session with an ID that already exists."""
     pass
