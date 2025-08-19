@@ -21,6 +21,7 @@ except NameError:
 
 import time
 import re
+import traceback
 
 # Helper function to clean Lua output
 def clean_output(output):
@@ -36,28 +37,37 @@ def clean_output(output):
 print("\n1. Testing Basic VM Creation and Execution")
 try:
     vm = create_vm("test_vm")
+    print(f"[DEBUG] VM object: {vm}")
     result = vm.execute_string('print("Hello from Lua!")')
+    print(f"[DEBUG] Execution result: {result}")
     print("✅ Basic VM:", result['stdout'])
 except Exception as e:
     print("❌ Basic VM failed:", e)
+    traceback.print_exc()
 
 # === 2. Networked VM ===
 print("\n2. Testing Networked VM")
 try:
     net_vm = create_vm("net_vm", networked=True)
+    print(f"[DEBUG] Networked VM object: {net_vm}")
     print("✅ Networked VM created successfully")
 except Exception as e:
     print("❌ Networked VM failed:", e)
+    traceback.print_exc()
 
 # === 3. VM Manager - Synchronous ===
 print("\n3. Testing VM Manager - Synchronous")
 try:
     with VMManager() as manager:
+        print(f"[DEBUG] VMManager object: {manager}")
         vm = manager.create_vm("managed_vm")
+        print(f"[DEBUG] Managed VM object: {vm}")
         result = manager.execute_vm_sync("managed_vm", 'print("Square root of 16 is:", math.sqrt(16))')
+        print(f"[DEBUG] Sync execution result: {result}")
         print("✅ VM Manager Sync:", result['stdout'])
 except Exception as e:
     print("❌ VM Manager Sync failed:", e)
+    traceback.print_exc()
 
 # === 4. Async Execution ===
 print("\n4. Testing Async Execution")
