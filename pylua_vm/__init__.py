@@ -8,7 +8,8 @@ Perfect for distributed computing, microservices, game servers, and sandboxed sc
 # Core VM management
 from .lua_process import LuaProcess
 from .vm_manager import VMManager, VMCluster
-
+from .vm_manager import VMManager, VMCluster
+from .interactive_session import InteractiveSession, SessionManager
 # Interactive terminal support  
 from .interactive_session import InteractiveSession, SessionManager
 
