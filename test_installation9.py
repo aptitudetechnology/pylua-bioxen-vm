@@ -75,19 +75,24 @@ try:
 except Exception as e:
     print("❌ Async VM failed:", e)
 
+
 # === 5. Interactive Session Lifecycle ===
 print("\n5. Testing Interactive Session Lifecycle")
+print("Debug: VMManager in globals?", 'VMManager' in globals())
+try:
+    import pylua_vm
+    print("Debug: pylua_vm.VMManager?", hasattr(pylua_vm, 'VMManager'))
+    print("Debug: VMManager type:", type(VMManager))
+except Exception as e:
+    print("Debug: VMManager not available:", e)
 try:
     manager = VMManager()
     vm_id = "interactive_test_vm"
-    
     # Cleanup any existing VM
     try: manager.terminate_vm_session(vm_id)
     except: pass
-    
     session = manager.create_interactive_vm(vm_id)
     print("✅ Interactive VM created")
-    
     manager.send_input(vm_id, "x = 42\n")
     manager.send_input(vm_id, "print('The answer is:', x)\n")
     time.sleep(0.2)
@@ -95,7 +100,6 @@ try:
     print(f"Debug output: {output!r}")
     if "The answer is: 42" in output: print("✅ Interactive I/O OK")
     else: print("⚠️ Unexpected output:", output)
-    
     # Session persistence
     manager.send_input(vm_id, "y = x * 2\n")
     manager.send_input(vm_id, "print('Double is:', y)\n")
@@ -103,7 +107,6 @@ try:
     output2 = clean_output(manager.read_output(vm_id))
     if "Double is: 84" in output2: print("✅ Session Persistence OK")
     else: print("⚠️ Session Persistence failed")
-    
     manager.detach_from_vm(vm_id)
     print("✅ Session detached")
     manager.terminate_vm_session(vm_id)
