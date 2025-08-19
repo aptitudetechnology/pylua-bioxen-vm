@@ -497,9 +497,9 @@ class VMManager:
         """Context manager exit with cleanup."""
         self.shutdown_all()
     def __repr__(self):
-        return (f"VMManager(vms={len(self.vms)}, "
-                f"interactive_sessions={len(self.session_manager)}, "
-                f"max_workers={self.max_workers})")
+    return (f"VMManager(vms={len(self.vms)}, "
+        f"interactive_sessions={len(self.session_manager.list_sessions())}, "
+        f"max_workers={self.max_workers})")
 
 # Keep the existing VMCluster class for backward compatibility
 class VMCluster:
