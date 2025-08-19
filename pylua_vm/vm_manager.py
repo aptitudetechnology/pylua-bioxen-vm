@@ -37,6 +37,41 @@ class VMManager:
         self.futures: Dict[str, Future] = {}
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self._lock = threading.Lock()
+        self._interactive_sessions: Dict[str, Any] = {}  # Track active interactive sessions
+    # --- Interactive Session Management ---
+    def attach_to_vm(self, vm_id: str) -> None:
+        """Start an interactive session for the given VM."""
+        vm = self.get_vm(vm_id)
+        if not vm:
+            raise ValueError(f"VM '{vm_id}' not found")
+        if vm_id in self._interactive_sessions:
+            raise ValueError(f"Interactive session for VM '{vm_id}' already running")
+        vm.start_interactive_session()
+        self._interactive_sessions[vm_id] = vm
+
+    def detach_vm(self, vm_id: str) -> None:
+        """Stop the interactive session for the given VM."""
+        vm = self._interactive_sessions.pop(vm_id, None)
+        if vm:
+            vm.stop_interactive_session()
+
+    def send_input(self, vm_id: str, input_str: str) -> None:
+        """Send input to the interactive session of the given VM."""
+        vm = self._interactive_sessions.get(vm_id)
+        if not vm:
+            raise ValueError(f"No interactive session for VM '{vm_id}'")
+        vm.send_input(input_str)
+
+    def read_output(self, vm_id: str, timeout: float = 0.1) -> str:
+        """Read output from the interactive session of the given VM."""
+        vm = self._interactive_sessions.get(vm_id)
+        if not vm:
+            raise ValueError(f"No interactive session for VM '{vm_id}'")
+        return vm.read_output(timeout=timeout)
+
+    def list_interactive_sessions(self) -> List[str]:
+        """List all VM IDs with active interactive sessions."""
+        return list(self._interactive_sessions.keys())
     
     def create_vm(self, vm_id: str, networked: bool = False) -> LuaProcess:
         """
@@ -439,10 +474,14 @@ class VMManager:
         # Clean up all VMs
         for vm in self.vms.values():
             vm.cleanup()
+        # Clean up interactive sessions
+        for vm_id in list(self._interactive_sessions.keys()):
+            self.detach_vm(vm_id)
         
         # Clear collections
         self.vms.clear()
         self.futures.clear()
+        self._interactive_sessions.clear()
         
         # Shutdown executor
         self.executor.shutdown(wait=True)

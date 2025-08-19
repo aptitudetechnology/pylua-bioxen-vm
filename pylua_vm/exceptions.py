@@ -25,6 +25,18 @@ class LuaSocketNotFoundError(LuaVMError):
     """Raised when LuaSocket library is not available."""
     pass
 
+class InteractiveSessionError(LuaVMError):
+    """Raised when an interactive session fails or encounters an error."""
+    pass
+
+class AttachError(InteractiveSessionError):
+    """Raised when attaching to an interactive session fails."""
+    pass
+
+class DetachError(InteractiveSessionError):
+    """Raised when detaching from an interactive session fails."""
+    pass
+
 class VMConnectionError(NetworkingError):
     """Raised when VM-to-VM connection fails."""
     def __init__(self, message, host=None, port=None):

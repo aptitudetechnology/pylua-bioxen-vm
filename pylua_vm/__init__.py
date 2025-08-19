@@ -9,6 +9,7 @@ microservices, game servers, and sandboxed scripting.
 from .lua_process import LuaProcess
 from .networking import NetworkedLuaVM, LuaScriptTemplate, validate_port, validate_host
 from .vm_manager import VMManager, VMCluster
+from .interactive_session import InteractiveSession
 from .exceptions import (
     LuaVMError,
     LuaProcessError, 
@@ -33,12 +34,11 @@ __all__ = [
     "NetworkedLuaVM", 
     "VMManager",
     "VMCluster",
-    
+    "InteractiveSession",
     # Utilities
     "LuaScriptTemplate",
     "validate_port",
     "validate_host",
-    
     # Exceptions
     "LuaVMError",
     "LuaProcessError",
@@ -48,7 +48,6 @@ __all__ = [
     "VMConnectionError",
     "VMTimeoutError",
     "ScriptGenerationError",
-    
     # Metadata
     "__version__",
 ]
