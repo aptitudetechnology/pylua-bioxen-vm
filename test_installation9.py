@@ -1,48 +1,14 @@
+
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from pylua_vm import VMManager, SessionManager, create_vm, InteractiveSession
-import sys, os
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-print("Testing pylua-bioxen-vm installation...")
-print("=" * 50)
-
-
-
-# === Top-level imports with robust fallback and global assignment ===
-import sys, os
-try:
-    from pylua_vm import VMManager, SessionManager, create_vm, InteractiveSession
-    from pylua_vm.exceptions import (
-        InteractiveSessionError, AttachError, DetachError, 
-        SessionNotFoundError, SessionAlreadyExistsError, 
-        VMManagerError, ProcessRegistryError
-    )
-    print("✅ Modules imported successfully")
-except ImportError as e:
-    print("❌ Module import failed:", e)
-    sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    try:
-        from pylua_vm import VMManager, SessionManager, create_vm, InteractiveSession
-        from pylua_vm.exceptions import (
-            InteractiveSessionError, AttachError, DetachError, 
-            SessionNotFoundError, SessionAlreadyExistsError, 
-            VMManagerError, ProcessRegistryError
-        )
-        print("✅ Modules imported successfully after fallback")
-    except ImportError as e2:
-        print("❌ Fallback import failed:", e2)
-        exit(1)
-
-# Ensure VMManager and SessionManager are available globally
-globals()['VMManager'] = VMManager
-globals()['SessionManager'] = SessionManager
-
-# Check if SessionManager is available
+from pylua_vm.exceptions import (
+    InteractiveSessionError, AttachError, DetachError, 
+    SessionNotFoundError, SessionAlreadyExistsError, 
+    VMManagerError, ProcessRegistryError
+)
+print("✅ Modules imported successfully")
 try:
     _ = SessionManager
     SESSION_MANAGER_AVAILABLE = True
