@@ -98,7 +98,8 @@ except Exception as e:
 
 print("\n5. Testing Interactive Session Lifecycle")
 try:
-    from pylua_vm import VMManager
+    import importlib
+    VMManager = importlib.import_module('pylua_vm').VMManager
     manager = VMManager()
     vm_id = "interactive_test_vm"
     # Cleanup any existing VM
@@ -133,7 +134,9 @@ except Exception as e:
 
 print("\n6. Testing Session Manager")
 try:
-    from pylua_vm import SessionManager, VMManager
+    import importlib
+    VMManager = importlib.import_module('pylua_vm').VMManager
+    SessionManager = importlib.import_module('pylua_vm').SessionManager
     session_manager = SessionManager()
     sessions = session_manager.list_sessions()
     print(f"✅ Active sessions: {len(sessions)}, {sessions!r}")
@@ -209,7 +212,8 @@ else:
 
 print("\n9. Testing Complex Interactive Session")
 try:
-    from pylua_vm import VMManager
+    import importlib
+    VMManager = importlib.import_module('pylua_vm').VMManager
     manager = VMManager()
     vm_id = "complex_session"
     try: manager.terminate_vm_session(vm_id)
@@ -242,7 +246,8 @@ except Exception as e: print("❌ Complex session failed:", e)
 
 print("\n10. Testing Session Reattachment")
 try:
-    from pylua_vm import VMManager
+    import importlib
+    VMManager = importlib.import_module('pylua_vm').VMManager
     manager = VMManager()
     vm_id = "reattach_test"
     try: manager.terminate_vm_session(vm_id)
