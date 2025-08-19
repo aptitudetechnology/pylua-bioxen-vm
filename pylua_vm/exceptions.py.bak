@@ -1,0 +1,68 @@
+"""
+Custom exceptions for pylua-bioxen-vm library.
+"""
+
+class LuaVMError(Exception):
+    """Base exception for all Lua VM related errors."""
+    pass
+
+class LuaProcessError(LuaVMError):
+    """Raised when there's an error with Lua subprocess execution."""
+    def __init__(self, message, return_code=None, stderr=None):
+        super().__init__(message)
+        self.return_code = return_code
+        self.stderr = stderr
+
+class NetworkingError(LuaVMError):
+    """Raised when there's an error with socket communication."""
+    pass
+
+class LuaNotFoundError(LuaVMError):
+    """Raised when the Lua interpreter is not found in PATH."""
+    pass
+
+class LuaSocketNotFoundError(LuaVMError):
+    """Raised when LuaSocket library is not available."""
+    pass
+
+class InteractiveSessionError(LuaVMError):
+    """Raised when an interactive session fails or encounters an error."""
+    pass
+
+    class SessionNotFoundError(InteractiveSessionError):
+        """Raised when trying to access a session that doesn't exist."""
+        pass
+
+    class SessionAlreadyExistsError(InteractiveSessionError):
+        """Raised when trying to create a session with an ID that already exists."""
+        pass
+
+    class VMManagerError(LuaVMError):
+        """Raised when there's an error with VM manager operations."""
+        pass
+
+    class ProcessRegistryError(VMManagerError):
+        """Raised when there's an error with the persistent VM registry."""
+        pass
+class AttachError(InteractiveSessionError):
+    """Raised when attaching to an interactive session fails."""
+    pass
+
+class DetachError(InteractiveSessionError):
+    """Raised when detaching from an interactive session fails."""
+    pass
+
+class VMConnectionError(NetworkingError):
+    """Raised when VM-to-VM connection fails."""
+    def __init__(self, message, host=None, port=None):
+        super().__init__(message)
+        self.host = host
+        self.port = port
+
+class VMTimeoutError(NetworkingError):
+    """Raised when VM operations timeout."""
+    pass
+
+class ScriptGenerationError(LuaVMError):
+    """Raised when there's an error generating dynamic Lua scripts."""
+    pass
