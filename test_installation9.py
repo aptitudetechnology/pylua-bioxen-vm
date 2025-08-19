@@ -76,16 +76,11 @@ except Exception as e:
     print("❌ Async VM failed:", e)
 
 
+
 # === 5. Interactive Session Lifecycle ===
 print("\n5. Testing Interactive Session Lifecycle")
-print("Debug: VMManager in globals?", 'VMManager' in globals())
 try:
-    import pylua_vm
-    print("Debug: pylua_vm.VMManager?", hasattr(pylua_vm, 'VMManager'))
-    print("Debug: VMManager type:", type(VMManager))
-except Exception as e:
-    print("Debug: VMManager not available:", e)
-try:
+    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "interactive_test_vm"
     # Cleanup any existing VM
@@ -114,33 +109,29 @@ try:
 except Exception as e:
     print("❌ Interactive Session failed:", e)
 
+
 # === 6. Session Manager Operations ===
 print("\n6. Testing Session Manager")
-if not SESSION_MANAGER_AVAILABLE:
-    print("⚠️ Session Manager test skipped")
-else:
-    try:
-        session_manager = SessionManager()
-        sessions = session_manager.list_sessions()
-        print(f"✅ Active sessions: {len(sessions)}, {sessions!r}")
-        
-        manager = VMManager()
-        vm_id = "session_manager_test"
-        try: manager.terminate_vm_session(vm_id)
-        except: pass
-        vm_instance = manager.create_interactive_vm(vm_id)
-        session_manager.create_session(vm_id, vm_instance)
-        print("✅ Session created via SessionManager")
-        
-        sessions = session_manager.list_sessions()
-        if vm_id in sessions: print("✅ Session appears in registry")
-        else: print("⚠️ Session not found")
-        
-        session_manager.terminate_session(vm_id)
-        manager.terminate_vm_session(vm_id)
-        print("✅ Session cleaned up")
-    except Exception as e:
-        print("❌ Session Manager failed:", e)
+try:
+    from pylua_vm import SessionManager, VMManager
+    session_manager = SessionManager()
+    sessions = session_manager.list_sessions()
+    print(f"✅ Active sessions: {len(sessions)}, {sessions!r}")
+    manager = VMManager()
+    vm_id = "session_manager_test"
+    try: manager.terminate_vm_session(vm_id)
+    except: pass
+    vm_instance = manager.create_interactive_vm(vm_id)
+    session_manager.create_session(vm_id, vm_instance)
+    print("✅ Session created via SessionManager")
+    sessions = session_manager.list_sessions()
+    if vm_id in sessions: print("✅ Session appears in registry")
+    else: print("⚠️ Session not found")
+    session_manager.terminate_session(vm_id)
+    manager.terminate_vm_session(vm_id)
+    print("✅ Session cleaned up")
+except Exception as e:
+    print("❌ Registry operations failed:", e)
 
 # === 7. Exception Handling ===
 print("\n7. Testing Exception Handling")
@@ -195,14 +186,15 @@ else:
         print("✅ Registry cleanup completed")
     except Exception as e: print("❌ Registry operations failed:", e)
 
+
 # === 9. Complex Interactive Session ===
 print("\n9. Testing Complex Interactive Session")
 try:
+    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "complex_session"
     try: manager.terminate_vm_session(vm_id)
     except: pass
-    
     session = manager.create_interactive_vm(vm_id)
     manager.send_input(vm_id, """
 function fibonacci(n)
@@ -214,7 +206,6 @@ end
     output = clean_output(manager.read_output(vm_id))
     if "Fibonacci 10: 55" in output: print("✅ Complex session OK")
     else: print("⚠️ Unexpected output:", output)
-    
     manager.send_input(vm_id, """
 for i=1,5 do print('Count:', i) end
 """)
@@ -222,34 +213,30 @@ for i=1,5 do print('Count:', i) end
     output = clean_output(manager.read_output(vm_id))
     if "Count: 5" in output: print("✅ Multi-line input OK")
     else: print("⚠️ Multi-line input failed")
-    
     manager.terminate_vm_session(vm_id)
 except Exception as e: print("❌ Complex session failed:", e)
+
 
 # === 10. Session Reattachment ===
 print("\n10. Testing Session Reattachment")
 try:
+    from pylua_vm import VMManager
     manager = VMManager()
     vm_id = "reattach_test"
     try: manager.terminate_vm_session(vm_id)
     except: pass
-    
     session = manager.create_interactive_vm(vm_id)
     manager.send_input(vm_id, "persistent_var = 'I persist!'\n")
     time.sleep(0.2)
-    
     manager.detach_from_vm(vm_id)
     print("✅ Detached from session")
-    
     manager.attach_to_vm(vm_id)
     print("✅ Reattached to session")
-    
     manager.send_input(vm_id, "print('Variable still exists:', persistent_var)\n")
     time.sleep(0.2)
     output = clean_output(manager.read_output(vm_id))
     if "I persist!" in output: print("✅ Session persistence OK")
     else: print("⚠️ Variables lost after reattachment")
-    
     manager.terminate_vm_session(vm_id)
 except Exception as e: print("❌ Session reattachment failed:", e)
 
