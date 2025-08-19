@@ -252,5 +252,5 @@ except Exception as e: print("❌ Session reattachment failed:", e)
 
 print("\n" + "=" * 50)
 print("Installation test complete!")
-print("All features tested for pylua-bioxen
+print("All features tested for pylua-bioxen")
 
