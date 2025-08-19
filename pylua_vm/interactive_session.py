@@ -8,6 +8,7 @@ import pty
 import threading
 import queue
 import subprocess
+import select
 from typing import Dict, List, Optional, Any
 import time
 import signal
