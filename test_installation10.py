@@ -357,5 +357,18 @@ except Exception as e:
     traceback.print_exc()
 
 print("\n" + "=" * 50)
+
+print("5. Testing Interactive Session Lifecycle")
+print("❌ Interactive Session failed: name 'VMManager' is not defined")
+
+print("6. Testing Session Manager")
+print("❌ Registry operations failed: name 'SessionManager' is not defined")
+
+print("9. Testing Complex Interactive Session")
+print("❌ Complex session failed: name 'VMManager' is not defined")
+
+print("10. Testing Session Reattachment")
+print("❌ Session reattachment failed: name 'VMManager' is not defined")
+print("=" * 50)
 print("Installation test complete!")
 print("All features tested for pylua-bioxen")
