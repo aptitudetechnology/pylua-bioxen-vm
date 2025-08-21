@@ -1,6 +1,6 @@
-# pylua-bioxen-vm Audit Instructions
+# pylua_bioxen_vm_lib Audit Instructions
 
-This file contains the structured audit instructions for Copilot or any engineer reviewing the pylua-bioxen-vm codebase. The focus is on session lifecycle management, interactive VM handling, and registry operations.
+This file contains the structured audit instructions for Copilot or any engineer reviewing the pylua_bioxen_vm_lib codebase. The focus is on session lifecycle management, interactive VM handling, and registry operations.
 
 ---
 
@@ -58,7 +58,7 @@ Produce a structured report with these sections:
 Use **Markdown** with headings:
 
 ```markdown
-# pylua-bioxen-vm Audit Report
+# pylua_bioxen_vm_lib Audit Report
 
 ## Summary
 ...

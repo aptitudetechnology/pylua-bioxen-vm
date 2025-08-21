@@ -1,3 +1,4 @@
+# pylua_bioxen_vm_lib Enhanced VM Management
 
 """
 High-level VM manager for orchestrating multiple Lua VMs.

@@ -1,4 +1,4 @@
-# pylua-bioxen-vm Interactive Terminal Refactor Plan
+# pylua_bioxen_vm_lib Interactive Terminal Refactor Plan
 
 ## Files to Update for Interactive Terminal Support
 

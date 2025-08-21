@@ -161,7 +161,7 @@ cython_debug/
 # VSCode
 .vscode/
 
-# pylua-bioxen-vm specific
+# pylua_bioxen_vm_lib specific
 *.lua.temp
 lua-vm/
 temp_*.lua

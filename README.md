@@ -1,10 +1,10 @@
-# pylua-bioxen-vm
+# pylua_bioxen_vm_lib
 
 A Python library for orchestrating networked Lua virtual machines through subprocess management and socket communication.
 
 ## Overview
 
-pylua-bioxen-vm provides a unique approach to running multiple Lua interpreters as isolated processes, managed from Python with built-in networking capabilities. Unlike embedded Lua solutions, this library offers true process isolation, fault tolerance, and dynamic scaling of Lua VMs.
+pylua_bioxen_vm_lib provides a unique approach to running multiple Lua interpreters as isolated processes, managed from Python with built-in networking capabilities. Unlike embedded Lua solutions, this library offers true process isolation, fault tolerance, and dynamic scaling of Lua VMs.
 
 ## Key Features
 
@@ -32,7 +32,7 @@ Python Process
 ## Installation
 
 ```bash
-pip install pylua-bioxen-vm
+pip install pylua_bioxen_vm_lib
 ```
 
 ### Prerequisites
@@ -44,7 +44,7 @@ pip install pylua-bioxen-vm
 ## Quick Start
 
 ```python
-from pylua-bioxen-vm import VMManager
+from pylua_bioxen_vm_lib import VMManager
 
 # Create a VM manager
 manager = VMManager()
@@ -102,7 +102,7 @@ example usage
 
 
 ```python
-from pylua-bioxen-vm import VMManager
+from pylua_bioxen_vm_lib import VMManager
 
 with VMManager() as manager:
     # Server VM
@@ -134,8 +134,8 @@ See the `examples/` directory for:
 ## Development
 
 ```bash
-git clone https://github.com/yourusername/pylua-bioxen-vm.git
-cd pylua-bioxen-vm
+git clone https://github.com/yourusername/pylua_bioxen_vm_lib.git
+cd pylua_bioxen_vm_lib
 pip install -e .
 python -m pytest tests/
 ```
@@ -148,9 +148,9 @@ Contributions welcome! Please read our contributing guidelines and submit pull r
 
 MIT License - see LICENSE file for details.
 
-## Why pylua-bioxen-vm?
+## Why pylua_bioxen_vm_lib?
 
-Existing Python-Lua integrations focus on embedding Lua within Python processes. pylua-bioxen-vm takes a different approach by managing separate Lua processes, providing:
+Existing Python-Lua integrations focus on embedding Lua within Python processes. pylua_bioxen_vm_lib takes a different approach by managing separate Lua processes, providing:
 
 - **True isolation** - One VM crash doesn't affect others
 - **Horizontal scaling** - Easy to distribute across cores/machines  

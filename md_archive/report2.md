@@ -6,9 +6,9 @@ Despite all import strategies and Python path adjustments, `NameError: name 'VMM
 ## sys.path Output
 Your current `sys.path` is:
 ```
-['', '/usr/lib/python310.zip', '/usr/lib/python3.10', '/usr/lib/python3.10/lib-dynload', '/home/chris/pylua-bioxen-vm/venv/lib/python3.10/site-packages']
+['', '/usr/lib/python310.zip', '/usr/lib/python3.10', '/usr/lib/python3.10/lib-dynload', '/home/chris/pylua_bioxen_vm_lib/venv/lib/python3.10/site-packages']
 ```
-- The project root `/home/chris/pylua-bioxen-vm` is missing from `sys.path`.
+- The project root `/home/chris/pylua_bioxen_vm_lib` is missing from `sys.path`.
 - Only site-packages and system paths are present.
 
 ## Why This Matters
@@ -17,14 +17,14 @@ Your current `sys.path` is:
 
 ## Action Plan
 1. **Verify Package Structure**
-   - Ensure `/home/chris/pylua-bioxen-vm/pylua_vm/__init__.py` exists and is not empty.
+   - Ensure `/home/chris/pylua_bioxen_vm_lib/pylua_vm/__init__.py` exists and is not empty.
    - Confirm there is no file named `pylua_vm.py` in your project root (it should be a directory).
 2. **Check for Shadowing**
    - Run:
      ```bash
      python3 -c "import pylua_vm; print(pylua_vm.__file__)"
      ```
-   - The output should be a path inside `/home/chris/pylua-bioxen-vm/pylua_vm/`. If not, you have a shadowing/conflict issue.
+   - The output should be a path inside `/home/chris/pylua_bioxen_vm_lib/pylua_vm/`. If not, you have a shadowing/conflict issue.
 3. **Direct Import Test**
    - In a Python shell:
      ```python

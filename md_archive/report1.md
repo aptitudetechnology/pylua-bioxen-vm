@@ -4,7 +4,7 @@
 Persistent `NameError: name 'VMManager' is not defined` and `SessionManager` errors in `test_installation9.py`, despite explicit imports and multiple fallback strategies. This is not a code logic bug, but a Python environment/module resolution issue.
 
 ## Key Findings
-- `pylua_vm` is a local package in `/home/chris/pylua-bioxen-vm/pylua_vm/`.
+- `pylua_vm` is a local package in `/home/chris/pylua_bioxen_vm_lib/pylua_vm/`.
 - `__init__.py` exists and exposes `VMManager` and `SessionManager`.
 - All import strategies (top-level, per-block, importlib) fail in some test blocks.
 - Other imports from `pylua_vm` (e.g., `create_vm`) work, confirming partial package visibility.
@@ -17,11 +17,11 @@ Persistent `NameError: name 'VMManager' is not defined` and `SessionManager` err
 
 ## Recommended Fix Steps
 1. **Ensure Package Structure:**
-   - Confirm `/home/chris/pylua-bioxen-vm/pylua_vm/__init__.py` exists and is not empty.
+   - Confirm `/home/chris/pylua_bioxen_vm_lib/pylua_vm/__init__.py` exists and is not empty.
 2. **Run from Project Root:**
-   - Change directory to `/home/chris/pylua-bioxen-vm` before running:
+   - Change directory to `/home/chris/pylua_bioxen_vm_lib` before running:
      ```bash
-     cd /home/chris/pylua-bioxen-vm
+   cd /home/chris/pylua_bioxen_vm_lib
      python3 test_installation9.py
      ```
 3. **Activate Virtual Environment (if used):**

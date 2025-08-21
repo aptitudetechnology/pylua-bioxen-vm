@@ -1,3 +1,4 @@
+# pylua_bioxen_vm_lib Interactive Session Class
 """
 InteractiveSession: Persistent interactive Lua VM session with PTY and threading support.
 """

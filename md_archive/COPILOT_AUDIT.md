@@ -1,6 +1,6 @@
 # 🔍 Audit Instructions for Copilot
 
-You are auditing the **pylua-bioxen-vm** codebase.
+You are auditing the **pylua_bioxen_vm_lib** codebase.
 Focus on **session lifecycle management, interactive VM handling, and registry operations**.
 
 ## 1. Locate Key Components
@@ -61,7 +61,7 @@ Produce a structured report with these sections:
 Use **Markdown** with headings:
 
 ```markdown
-# pylua-bioxen-vm Audit Report
+# pylua_bioxen_vm_lib Audit Report
 
 ## Summary
 ...

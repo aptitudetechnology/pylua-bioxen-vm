@@ -1,4 +1,4 @@
-I'm implementing interactive terminal support for Lua VMs to work like a hypervisor. Based on previous analysis, I need to modify these core files in the pylua-bioxen-vm library:
+I'm implementing interactive terminal support for Lua VMs to work like a hypervisor. Based on previous analysis, I need to modify these core files in the pylua_bioxen_vm_lib library:
 
 REQUIRED FILES TO UPDATE:
 1. LuaProcess class file - Convert from subprocess.run to subprocess.Popen with PTY support for persistent interactive processes

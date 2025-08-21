@@ -1,6 +1,6 @@
 # COPILOT_FIXFLOW.md
 
-⚠️ Important: This runbook describes the step-by-step workflow for auditing, patching, and testing the pylua-bioxen-vm codebase using Copilot (or any LLM assistant) and the provided audit/patch playbooks.
+⚠️ Important: This runbook describes the step-by-step workflow for auditing, patching, and testing the pylua_bioxen_vm_lib codebase using Copilot (or any LLM assistant) and the provided audit/patch playbooks.
 
 ---
 

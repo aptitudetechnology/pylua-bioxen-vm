@@ -1,4 +1,4 @@
-# pylua-bioxen-vm Interactive Terminal Refactor Progress Report
+# pylua_bioxen_vm_lib Interactive Terminal Refactor Progress Report
 
 ## Current State
 - The `InteractiveSession` class in `pylua_vm/interactive_session.py` provides basic persistent Lua interpreter management with PTY, threading, and bidirectional I/O.

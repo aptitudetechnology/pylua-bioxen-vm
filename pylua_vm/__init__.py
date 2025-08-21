@@ -1,5 +1,5 @@
 """
-pylua-bioxen-vm: A Python library for orchestrating networked Lua virtual machines.
+pylua_bioxen_vm_lib: A Python library for orchestrating networked Lua virtual machines.
 This library provides process-isolated Lua VMs managed from Python with built-in
 networking capabilities using LuaSocket and full interactive terminal support.
 Perfect for distributed computing, microservices, game servers, and sandboxed scripting.
@@ -31,10 +31,10 @@ from .exceptions import (
 )
 
 __version__ = "0.2.0"
-__author__ = "pylua-bioxen-vm contributors"  
+__author__ = "pylua_bioxen_vm_lib contributors"  
 __email__ = ""
 __description__ = "Process-isolated networked Lua VMs with interactive terminal support"
-__url__ = "https://github.com/yourusername/pylua-bioxen-vm"
+__url__ = "https://github.com/yourusername/pylua_bioxen_vm_lib"
 
 __all__ = [
     "LuaProcess",

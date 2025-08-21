@@ -1,4 +1,4 @@
-# Failing Imports Debug Report
+# pylua_bioxen_vm_lib Failing Imports Report
 
 ## Overview
 This report analyzes why Tests 5, 6, 9, and 10 in `test_installation8.py` fail with `name 'VMManager' is not defined` and `name 'SessionManager' is not defined`, despite successful top-level imports from `pylua_vm`.

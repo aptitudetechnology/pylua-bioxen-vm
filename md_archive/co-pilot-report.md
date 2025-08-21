@@ -1,4 +1,4 @@
-# pylua-bioxen-vm Library Analysis & Extension Recommendations
+# pylua_bioxen_vm_lib Library Analysis & Extension Recommendations
 
 ## 1. Subprocess Management Implementation
 - **Class:** `LuaProcess`
