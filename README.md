@@ -14,6 +14,36 @@ pylua_bioxen_vm_lib provides a unique approach to running multiple Lua interpret
 - **Dynamic VM management** - Spawn and terminate VMs as needed
 - **Language-agnostic architecture** - Could be extended to other interpreters
 - **Python orchestration** - Full lifecycle management from Python
+- **Interactive sessions** - Attach/detach to running VMs for real-time interaction
+## Interactive Terminal Support
+
+pylua_bioxen_vm_lib now supports interactive session management, allowing you to attach to running Lua VMs and interact with them in real-time.
+
+### Interactive Session Management
+- Attach/detach to running Lua VMs
+- Send input and receive output in real-time
+- Session lifecycle management
+- Multiple concurrent sessions per VM
+
+### Example Usage
+```python
+from pylua_bioxen_vm_lib import VMManager, InteractiveSession
+
+manager = VMManager()
+vm = manager.create_vm("interactive_vm")
+
+# Start an interactive session
+session = InteractiveSession(vm)
+session.attach()
+
+# Send commands and get responses
+session.send_input("x = 42")
+session.send_input("print(x)")
+output = session.read_output()
+
+# Detach when done
+session.detach()
+```
 
 ## Architecture
 
