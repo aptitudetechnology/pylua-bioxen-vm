@@ -8,6 +8,7 @@ that can communicate via sockets using LuaSocket.
 from typing import Optional, Dict, Any
 from .lua_process import LuaProcess
 from .exceptions import NetworkingError, VMConnectionError, LuaSocketNotFoundError
+from .logger import VMLogger
 
 
 class NetworkedLuaVM(LuaProcess):
