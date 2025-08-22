@@ -557,7 +557,7 @@ def main():
     print("• Build networked applications with automatic dependency management")
     print("• Monitor system health and get intelligent package recommendations")
     
-    print_section("AGI Bootstrapping System Ready!", "=")
+    print_section("Packaing System Ready!", "=")
 
 
 if __name__ == "__main__":
@@ -570,4 +570,4 @@ if __name__ == "__main__":
         print(f"\n\nDemo failed with unexpected error: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
+        sys.exit(1)py
