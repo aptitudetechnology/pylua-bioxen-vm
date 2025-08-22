@@ -125,13 +125,13 @@ pylua_vm/
 ├── networking.py            ✅ Complete (curator integrated)
 ├── env.py                   ✅ Complete
 ├── logger.py                🔄 Needs enhancement for integration
-├── cli.py                   📝 To be created
+├── cli.py                   ✅ Complete
 ├── exceptions.py            ✅ Existing
 ├── interactive_session.py   ✅ Existing
 └── logs/                    📁 Directory for curator logs
 
 examples/
-├── integration_demo.py      📝 HIGH PRIORITY - To be created
+├── integration_demo.py      ✅ Complete
 └── basic_usage.py           📝 To be created
 
 tests/
