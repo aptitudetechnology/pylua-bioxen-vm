@@ -17,7 +17,7 @@ class NetworkedLuaVM(LuaProcess):
     Extends LuaProcess with methods for server, client, and P2P communication modes.
     """
     
-    def __init__(self, name: str = "NetworkedLuaVM", lua_executable: str = "lua"):
+    def __init__(self, name: str = "NetworkedLuaVM", lua_executable: str = "lua", debug_mode: bool = False):
         super().__init__(name=name, lua_executable=lua_executable, debug_mode=debug_mode)
         self.logger = VMLogger(debug_mode=debug_mode, component="NetworkedLuaVM")
         self._verify_luasocket()
