@@ -18,7 +18,8 @@ class NetworkedLuaVM(LuaProcess):
     """
     
     def __init__(self, name: str = "NetworkedLuaVM", lua_executable: str = "lua"):
-        super().__init__(name, lua_executable)
+        super().__init__(name=name, lua_executable=lua_executable, debug_mode=debug_mode)
+        self.logger = VMLogger(debug_mode=debug_mode, component="NetworkedLuaVM")
         self._verify_luasocket()
     
     def _verify_luasocket(self) -> None:
