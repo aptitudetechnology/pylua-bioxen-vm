@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Optional, Union, Dict, Any
+from typing import Optional, Union, Dict, Any, List
 from .exceptions import (
     LuaProcessError, 
     LuaNotFoundError, 
@@ -14,14 +14,16 @@ from .exceptions import (
 )
 from .interactive_session import InteractiveSession
 from .logger import VMLogger
+from .utils.curator import Curator
 
 
 class LuaProcess:
     """
-    Manages a single Lua interpreter subprocess.
+    Manages a single Lua interpreter subprocess with intelligent package curation.
     
     This class handles the execution of Lua code through subprocess calls,
-    supporting both string execution and script file execution.
+    supporting both string execution and script file execution, enhanced with
+    curator-based package management for AGI bootstrapping.
     """
     
     def __init__(self, name: str = "LuaVM", lua_executable: str = "lua", debug_mode: bool = False):
@@ -40,11 +42,228 @@ class LuaProcess:
         self._temp_scripts = []  # Track temporary script files for cleanup
         self._interactive_session: Optional[InteractiveSession] = None
         
+        # Initialize curator for intelligent package management
+        self._curator: Optional[Curator] = None
+        self._packages_setup = False
+        
         self.logger.debug(f"Initializing LuaProcess: name='{name}', executable='{lua_executable}'")
         
         # Verify Lua is available
         self._verify_lua_available()
         
+    # --- Curator Integration Methods ---
+    
+    def setup_packages(self, profile: str = 'standard') -> Dict[str, Any]:
+        """
+        Setup packages using curator with specified profile.
+        
+        Args:
+            profile: Environment profile ('minimal', 'standard', 'full')
+            
+        Returns:
+            Dict with setup results and package information
+        """
+        self.logger.debug(f"Setting up packages with profile: '{profile}'")
+        
+        try:
+            # Initialize curator if not already done
+            if self._curator is None:
+                self._curator = Curator()
+                self.logger.debug("Curator initialized")
+            
+            # Curate the environment
+            result = self._curator.curate_environment(profile)
+            self._packages_setup = True
+            
+            setup_info = {
+                'success': result.get('success', False),
+                'profile': profile,
+                'packages_installed': result.get('installed_packages', []),
+                'failed_packages': result.get('failed_packages', []),
+                'total_packages': len(result.get('installed_packages', []) + result.get('failed_packages', [])),
+                'curator_recommendations': self._curator.get_recommendations() if result.get('success') else []
+            }
+            
+            if setup_info['success']:
+                self.logger.debug(f"Package setup completed successfully: {len(setup_info['packages_installed'])} packages installed")
+            else:
+                self.logger.debug(f"Package setup had issues: {len(setup_info['failed_packages'])} packages failed")
+                
+            return setup_info
+            
+        except Exception as e:
+            self.logger.debug(f"Package setup failed with exception: {e}")
+            error_result = {
+                'success': False,
+                'profile': profile,
+                'error': str(e),
+                'packages_installed': [],
+                'failed_packages': [],
+                'total_packages': 0
+            }
+            return error_result
+    
+    def install_package(self, package_name: str, version: str = 'latest') -> Dict[str, Any]:
+        """
+        Install a specific package via curator.
+        
+        Args:
+            package_name: Name of the package to install
+            version: Version constraint (default: 'latest')
+            
+        Returns:
+            Dict with installation results
+        """
+        self.logger.debug(f"Installing package: '{package_name}' (version: {version})")
+        
+        try:
+            # Initialize curator if not already done
+            if self._curator is None:
+                self._curator = Curator()
+                self.logger.debug("Curator initialized for package installation")
+            
+            # Install the package
+            result = self._curator.install_package(package_name, version)
+            
+            install_info = {
+                'success': result.get('success', False),
+                'package': package_name,
+                'version': version,
+                'installed_version': result.get('installed_version'),
+                'dependencies': result.get('dependencies', []),
+                'error': result.get('error') if not result.get('success') else None
+            }
+            
+            if install_info['success']:
+                self.logger.debug(f"Package '{package_name}' installed successfully")
+            else:
+                self.logger.debug(f"Package '{package_name}' installation failed: {install_info['error']}")
+                
+            return install_info
+            
+        except Exception as e:
+            self.logger.debug(f"Package installation failed with exception: {e}")
+            return {
+                'success': False,
+                'package': package_name,
+                'version': version,
+                'error': str(e)
+            }
+    
+    def get_package_recommendations(self) -> List[Dict[str, Any]]:
+        """
+        Get curator recommendations for packages to install.
+        
+        Returns:
+            List of recommendation dictionaries with package info and rationale
+        """
+        self.logger.debug("Getting package recommendations from curator")
+        
+        try:
+            # Initialize curator if not already done
+            if self._curator is None:
+                self._curator = Curator()
+                self.logger.debug("Curator initialized for recommendations")
+            
+            recommendations = self._curator.get_recommendations()
+            self.logger.debug(f"Retrieved {len(recommendations)} recommendations")
+            
+            return recommendations
+            
+        except Exception as e:
+            self.logger.debug(f"Failed to get recommendations: {e}")
+            return []
+    
+    def check_environment_health(self) -> Dict[str, Any]:
+        """
+        Check system health via curator.
+        
+        Returns:
+            Dict with health check results and diagnostics
+        """
+        self.logger.debug("Performing environment health check via curator")
+        
+        try:
+            # Initialize curator if not already done
+            if self._curator is None:
+                self._curator = Curator()
+                self.logger.debug("Curator initialized for health check")
+            
+            health_result = self._curator.health_check()
+            
+            # Add VM-specific health information
+            health_result['vm_info'] = {
+                'name': self.name,
+                'lua_executable': self.lua_executable,
+                'packages_setup': self._packages_setup,
+                'interactive_session_running': self.is_interactive_running(),
+                'temp_scripts_count': len(self._temp_scripts)
+            }
+            
+            self.logger.debug(f"Health check completed: overall_health={health_result.get('overall_health', 'unknown')}")
+            
+            return health_result
+            
+        except Exception as e:
+            self.logger.debug(f"Health check failed with exception: {e}")
+            return {
+                'overall_health': 'error',
+                'error': str(e),
+                'vm_info': {
+                    'name': self.name,
+                    'lua_executable': self.lua_executable,
+                    'packages_setup': self._packages_setup,
+                    'interactive_session_running': self.is_interactive_running(),
+                    'temp_scripts_count': len(self._temp_scripts)
+                }
+            }
+    
+    def get_installed_packages(self) -> List[str]:
+        """
+        Get list of currently installed packages.
+        
+        Returns:
+            List of installed package names
+        """
+        self.logger.debug("Getting list of installed packages")
+        
+        try:
+            if self._curator is None:
+                self.logger.debug("Curator not initialized, returning empty package list")
+                return []
+            
+            packages = self._curator.get_installed_packages()
+            self.logger.debug(f"Found {len(packages)} installed packages")
+            
+            return packages
+            
+        except Exception as e:
+            self.logger.debug(f"Failed to get installed packages: {e}")
+            return []
+    
+    def get_curator_manifest(self) -> Dict[str, Any]:
+        """
+        Get the current curator manifest for reproducible environments.
+        
+        Returns:
+            Manifest dictionary with environment configuration
+        """
+        self.logger.debug("Getting curator manifest")
+        
+        try:
+            if self._curator is None:
+                self.logger.debug("Curator not initialized, returning empty manifest")
+                return {}
+            
+            manifest = self._curator.get_manifest()
+            self.logger.debug("Retrieved curator manifest")
+            
+            return manifest
+            
+        except Exception as e:
+            self.logger.debug(f"Failed to get curator manifest: {e}")
+            return {}
+
     # --- Interactive Session Methods ---
     def start_interactive_session(self):
         """Start a persistent interactive Lua interpreter session."""
@@ -268,13 +487,19 @@ class LuaProcess:
             self.logger.debug(f"Warning: Could not remove temporary script {script_path}: {e}")
     
     def cleanup(self) -> None:
-        """Clean up all temporary script files."""
+        """Clean up all temporary script files and curator resources."""
         self.logger.debug(f"Cleaning up {len(self._temp_scripts)} temporary scripts and stopping interactive session")
         for script_path in self._temp_scripts[:]:  # Copy list to avoid modification during iteration
             self._cleanup_temp_script(script_path)
         if self._interactive_session:
             self._interactive_session.stop()
             self._interactive_session = None
+        
+        # Clean up curator resources if needed
+        if self._curator:
+            self.logger.debug("Cleaning up curator resources")
+            # Note: Curator cleanup would be implemented here if needed
+            
         self.logger.debug("Cleanup completed")
     
     def __del__(self):
@@ -282,4 +507,4 @@ class LuaProcess:
         self.cleanup()
     
     def __repr__(self):
-        return f"LuaProcess(name='{self.name}', lua_executable='{self.lua_executable}', debug_mode={self.debug_mode})"
+        return f"LuaProcess(name='{self.name}', lua_executable='{self.lua_executable}', debug_mode={self.debug_mode}, packages_setup={self._packages_setup})"
