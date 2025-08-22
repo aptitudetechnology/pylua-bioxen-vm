@@ -2,11 +2,17 @@ import sys, os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from pylua_vm import VMManager, SessionManager, create_vm, InteractiveSession
+from pylua_vm.logger import VMLogger
 from pylua_vm.exceptions import (
     InteractiveSessionError, AttachError, DetachError, 
     SessionNotFoundError, SessionAlreadyExistsError, 
     VMManagerError, ProcessRegistryError
 )
+
+# Initialize debug mode - can be controlled via environment variable
+debug_mode = os.getenv('PYLUA_DEBUG', 'false').lower() in ('true', '1', 'yes', 'on')
+logger = VMLogger(debug_mode=debug_mode, component="TestInstallation")
+
 SESSION_MANAGER_AVAILABLE = True
 print("✅ Modules imported successfully")
 print("✅ SessionManager available")
@@ -45,10 +51,10 @@ def check_output_contains(output, expected_parts, test_name=""):
 # === 1. Basic VM Creation ===
 print("\n1. Testing Basic VM Creation and Execution")
 try:
-    vm = create_vm("test_vm")
-    print(f"[DEBUG] VM object: {vm}")
+    vm = create_vm("test_vm", debug_mode=debug_mode)
+    logger.debug(f"VM object: {vm}")
     result = vm.execute_string('print("Hello from Lua!")')
-    print(f"[DEBUG] Execution result: {result}")
+    logger.debug(f"Execution result: {result}")
     print("✅ Basic VM:", result['stdout'])
 except Exception as e:
     print("❌ Basic VM failed:", e)
@@ -57,8 +63,8 @@ except Exception as e:
 # === 2. Networked VM ===
 print("\n2. Testing Networked VM")
 try:
-    net_vm = create_vm("net_vm", networked=True)
-    print(f"[DEBUG] Networked VM object: {net_vm}")
+    net_vm = create_vm("net_vm", networked=True, debug_mode=debug_mode)
+    logger.debug(f"Networked VM object: {net_vm}")
     print("✅ Networked VM created successfully")
 except Exception as e:
     print("❌ Networked VM failed:", e)
@@ -67,12 +73,12 @@ except Exception as e:
 # === 3. VM Manager - Synchronous ===
 print("\n3. Testing VM Manager - Synchronous")
 try:
-    with VMManager() as manager:
-        print(f"[DEBUG] VMManager object: {manager}")
+    with VMManager(debug_mode=debug_mode) as manager:
+        logger.debug(f"VMManager object: {manager}")
         vm = manager.create_vm("managed_vm")
-        print(f"[DEBUG] Managed VM object: {vm}")
+        logger.debug(f"Managed VM object: {vm}")
         result = manager.execute_vm_sync("managed_vm", 'print("Square root of 16 is:", math.sqrt(16))')
-        print(f"[DEBUG] Sync execution result: {result}")
+        logger.debug(f"Sync execution result: {result}")
         print("✅ VM Manager Sync:", result['stdout'])
 except Exception as e:
     print("❌ VM Manager Sync failed:", e)
@@ -81,14 +87,14 @@ except Exception as e:
 # === 4. Async Execution ===
 print("\n4. Testing Async Execution")
 try:
-    with VMManager() as manager:
-        print(f"[DEBUG] VMManager object: {manager}")
+    with VMManager(debug_mode=debug_mode) as manager:
+        logger.debug(f"VMManager object: {manager}")
         vm = manager.create_vm("async_vm")
-        print(f"[DEBUG] Async VM object: {vm}")
+        logger.debug(f"Async VM object: {vm}")
         future = manager.execute_vm_async("async_vm", 'print("Async execution works!")')
-        print(f"[DEBUG] Future object: {future}")
+        logger.debug(f"Future object: {future}")
         result = future.result()
-        print(f"[DEBUG] Async execution result: {result}")
+        logger.debug(f"Async execution result: {result}")
         print("✅ Async VM:", result['stdout'])
 except Exception as e:
     print("❌ Async VM failed:", e)
@@ -97,25 +103,25 @@ except Exception as e:
 # === 5. Interactive Session Lifecycle ===
 print("\n5. Testing Interactive Session Lifecycle")
 try:
-    manager = VMManager()
-    print(f"[DEBUG] VMManager object: {manager}")
+    manager = VMManager(debug_mode=debug_mode)
+    logger.debug(f"VMManager object: {manager}")
     vm_id = "interactive_test_vm"
     # Cleanup any existing VM
     try:
         manager.terminate_vm_session(vm_id)
-        print(f"[DEBUG] Terminated any existing VM session for {vm_id}")
+        logger.debug(f"Terminated any existing VM session for {vm_id}")
     except Exception as cleanup_e:
-        print(f"[DEBUG] Cleanup exception (OK): {cleanup_e}")
+        logger.debug(f"Cleanup exception (OK): {cleanup_e}")
     
     session = manager.create_interactive_vm(vm_id)
-    print(f"[DEBUG] Interactive session object: {session}")
+    logger.debug(f"Interactive session object: {session}")
     
     # Test basic I/O
     manager.send_input(vm_id, "x = 42\n")
     manager.send_input(vm_id, "print('The answer is:', x)\n")
     time.sleep(0.5)
     output = manager.read_output(vm_id)
-    print(f"[DEBUG] Output after setting x=42: {output!r}")
+    logger.debug(f"Output after setting x=42: {output!r}")
     
     success, message = check_output_contains(output, ["The answer is", "42"], "basic I/O")
     if success:
@@ -128,7 +134,7 @@ try:
     manager.send_input(vm_id, "print('Double is:', y)\n")
     time.sleep(0.5)
     output2 = manager.read_output(vm_id)
-    print(f"[DEBUG] Output after setting y=x*2: {output2!r}")
+    logger.debug(f"Output after setting y=x*2: {output2!r}")
     
     success, message = check_output_contains(output2, ["Double is", "84"], "session persistence")
     if success:
@@ -148,7 +154,7 @@ except Exception as e:
 # === 6. Testing Session Manager ===
 print("\n6. Testing Session Manager")
 try:
-    manager = VMManager()
+    manager = VMManager(debug_mode=debug_mode)
     # Use the same session manager instance as VMManager
     session_manager = manager.session_manager
     sessions = session_manager.list_sessions()
@@ -181,7 +187,7 @@ except Exception as e:
 # === 7. Exception Handling ===
 print("\n7. Testing Exception Handling")
 try:
-    manager = VMManager()
+    manager = VMManager(debug_mode=debug_mode)
     try: 
         manager.attach_to_vm("nonexistent_vm")
     except SessionNotFoundError: 
@@ -192,7 +198,7 @@ except Exception as e:
     print("⚠️ Unexpected exception in SessionNotFoundError test:", e)
 
 try:
-    manager = VMManager()
+    manager = VMManager(debug_mode=debug_mode)
     vm_id = "duplicate_test"
     try: 
         manager.terminate_vm_session(vm_id)
@@ -215,7 +221,7 @@ except Exception as e:
     print("⚠️ Unexpected exception in duplicate test:", e)
 
 try:
-    manager = VMManager()
+    manager = VMManager(debug_mode=debug_mode)
     try: 
         manager.detach_from_vm("never_attached_vm")
     except (DetachError, SessionNotFoundError):
@@ -231,7 +237,7 @@ if not SESSION_MANAGER_AVAILABLE:
     print("⚠️ VM Registry test skipped")
 else:
     try:
-        manager = VMManager()
+        manager = VMManager(debug_mode=debug_mode)
         session_manager = manager.session_manager  # Use same instance
         vm_ids = ["registry_vm_1", "registry_vm_2", "registry_vm_3"]
         
@@ -272,7 +278,7 @@ else:
 # === 9. Testing Complex Interactive Session ===
 print("\n9. Testing Complex Interactive Session")
 try:
-    manager = VMManager()
+    manager = VMManager(debug_mode=debug_mode)
     vm_id = "complex_session"
     try: 
         manager.terminate_vm_session(vm_id)
@@ -288,7 +294,7 @@ try:
     manager.send_input(vm_id, "print('Fibonacci 10:', fibonacci(10))\n")
     time.sleep(1.0)
     output = manager.read_output(vm_id)
-    print(f"[DEBUG] Output after fibonacci(10): {output!r}")
+    logger.debug(f"Output after fibonacci(10): {output!r}")
     
     success, message = check_output_contains(output, ["Fibonacci 10", "55"], "fibonacci function")
     if success:
@@ -300,7 +306,7 @@ try:
     manager.send_input(vm_id, "for i=1,5 do print('Count:', i) end\n")
     time.sleep(1.0)
     output = manager.read_output(vm_id)
-    print(f"[DEBUG] Output after for loop: {output!r}")
+    logger.debug(f"Output after for loop: {output!r}")
     
     success, message = check_output_contains(output, ["Count", "1", "Count", "5"], "for loop")
     if success:
@@ -317,7 +323,7 @@ except Exception as e:
 # === 10. Testing Session Reattachment ===
 print("\n10. Testing Session Reattachment")
 try:
-    manager = VMManager()
+    manager = VMManager(debug_mode=debug_mode)
     vm_id = "reattach_test"
     try: 
         manager.terminate_vm_session(vm_id)
@@ -330,7 +336,7 @@ try:
     manager.send_input(vm_id, "persistent_var = 'I persist!'\n")
     time.sleep(0.5)
     output1 = manager.read_output(vm_id)
-    print(f"[DEBUG] Output after setting persistent_var: {output1!r}")
+    logger.debug(f"Output after setting persistent_var: {output1!r}")
     
     # Detach and reattach
     manager.detach_from_vm(vm_id)
@@ -342,7 +348,7 @@ try:
     manager.send_input(vm_id, "print('Variable still exists:', persistent_var)\n")
     time.sleep(0.5)
     output2 = manager.read_output(vm_id)
-    print(f"[DEBUG] Output after reattach and print: {output2!r}")
+    logger.debug(f"Output after reattach and print: {output2!r}")
     
     success, message = check_output_contains(output2, ["Variable still exists", "I persist"], "variable persistence")
     if success:
@@ -357,18 +363,11 @@ except Exception as e:
     traceback.print_exc()
 
 print("\n" + "=" * 50)
-
-print("5. Testing Interactive Session Lifecycle")
-print("❌ Interactive Session failed: name 'VMManager' is not defined")
-
-print("6. Testing Session Manager")
-print("❌ Registry operations failed: name 'SessionManager' is not defined")
-
-print("9. Testing Complex Interactive Session")
-print("❌ Complex session failed: name 'VMManager' is not defined")
-
-print("10. Testing Session Reattachment")
-print("❌ Session reattachment failed: name 'VMManager' is not defined")
-print("=" * 50)
 print("Installation test complete!")
 print("All features tested for pylua-bioxen")
+
+# Debug mode info
+if debug_mode:
+    print(f"\n🔧 Debug mode was ENABLED (PYLUA_DEBUG={os.getenv('PYLUA_DEBUG', 'not set')})")
+else:
+    print(f"\n🔧 Debug mode was DISABLED. Set PYLUA_DEBUG=true to enable detailed logging.")
