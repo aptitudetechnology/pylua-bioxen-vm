@@ -570,4 +570,4 @@ if __name__ == "__main__":
         print(f"\n\nDemo failed with unexpected error: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)py
+        sys.exit(1)
