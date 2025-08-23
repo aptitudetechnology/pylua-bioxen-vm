@@ -12,8 +12,8 @@ from typing import Dict, List, Optional, Any
 import time
 import signal
 from typing import Dict, Optional, Callable
-from .exceptions import InteractiveSessionError, SessionNotFoundError, SessionAlreadyExistsError
-from .logger import VMLogger
+from pylua_bioxen_vm_lib.exceptions import InteractiveSessionError, SessionNotFoundError, SessionAlreadyExistsError
+from pylua_bioxen_vm_lib.logger import VMLogger
 
 
 class InteractiveSession:
@@ -103,7 +103,7 @@ class InteractiveSession:
             self.logger.debug(f"Session {self.session_id} attached")
 
     def detach(self):
-        from .exceptions import DetachError
+    from pylua_bioxen_vm_lib.exceptions import DetachError
         with self._lock:
             if not self._attached:
                 raise DetachError("Session is not currently attached")

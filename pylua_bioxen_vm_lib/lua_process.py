@@ -7,14 +7,14 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Optional, Union, Dict, Any, List
-from .exceptions import (
+from pylua_bioxen_vm_lib.exceptions import (
     LuaProcessError, 
     LuaNotFoundError, 
     ScriptGenerationError
 )
-from .interactive_session import InteractiveSession
-from .logger import VMLogger
-from .utils.curator import Curator
+from pylua_bioxen_vm_lib.interactive_session import InteractiveSession
+from pylua_bioxen_vm_lib.logger import VMLogger
+from pylua_bioxen_vm_lib.utils.curator import Curator
 
 
 class LuaProcess:

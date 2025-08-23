@@ -10,8 +10,8 @@ import time
 from typing import Dict, List, Optional, Any, Callable
 from concurrent.futures import ThreadPoolExecutor, Future
 
-from .lua_process import LuaProcess
-from .networking import NetworkedLuaVM
+from pylua_bioxen_vm_lib.lua_process import LuaProcess
+from pylua_bioxen_vm_lib.networking import NetworkedLuaVM
 
 """
 High-level VM manager for orchestrating multiple Lua VMs with interactive terminal support.
@@ -25,9 +25,9 @@ from concurrent.futures import ThreadPoolExecutor, Future
 
 from .lua_process import LuaProcess
 from .networking import NetworkedLuaVM
-from .interactive_session import InteractiveSession, SessionManager
-from .logger import VMLogger
-from .exceptions import (
+from pylua_bioxen_vm_lib.interactive_session import InteractiveSession, SessionManager
+from pylua_bioxen_vm_lib.logger import VMLogger
+from pylua_bioxen_vm_lib.exceptions import (
     VMManagerError, 
     ProcessRegistryError,
     InteractiveSessionError,

@@ -7,9 +7,9 @@ package curation for AGI bootstrapping.
 """
 
 from typing import Optional, Dict, Any, List
-from .lua_process import LuaProcess
-from .exceptions import NetworkingError, VMConnectionError, LuaSocketNotFoundError
-from .logger import VMLogger
+from pylua_bioxen_vm_lib.lua_process import LuaProcess
+from pylua_bioxen_vm_lib.exceptions import NetworkingError, VMConnectionError, LuaSocketNotFoundError
+from pylua_bioxen_vm_lib.logger import VMLogger
 
 
 class NetworkedLuaVM(LuaProcess):
@@ -43,7 +43,7 @@ class NetworkedLuaVM(LuaProcess):
         try:
             # Initialize curator if not already done
             if self._curator is None:
-                from .utils.curator import Curator
+                from pylua_bioxen_vm_lib.utils.curator import Curator
                 self._curator = Curator()
                 self.logger.debug("Curator initialized for networking setup")
             

@@ -12,8 +12,8 @@ import subprocess
 import shutil
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
-from .logger import VMLogger
-from .exceptions import LuaNotFoundError
+from pylua_bioxen_vm_lib.logger import VMLogger
+from pylua_bioxen_vm_lib.exceptions import LuaNotFoundError
 
 
 class EnvironmentManager:
