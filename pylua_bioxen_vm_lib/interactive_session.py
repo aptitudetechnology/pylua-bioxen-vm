@@ -103,7 +103,7 @@ class InteractiveSession:
             self.logger.debug(f"Session {self.session_id} attached")
 
     def detach(self):
-    from pylua_bioxen_vm_lib.exceptions import DetachError
+        from pylua_bioxen_vm_lib.exceptions import DetachError
         with self._lock:
             if not self._attached:
                 raise DetachError("Session is not currently attached")
