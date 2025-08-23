@@ -2,11 +2,11 @@
 Basic usage example for PyLua VM Curator system.
 Demonstrates environment setup, package installation, VM creation, and health checks.
 """
-from pylua_vm.env import EnvironmentManager
-from pylua_vm.utils.curator import Curator
-from pylua_vm.lua_process import LuaProcess
-from pylua_vm.vm_manager import VMManager
-from pylua_vm.interactive_session import SessionManager
+from pylua_bioxen_vm_lib.env import EnvironmentManager
+from pylua_bioxen_vm_lib.utils.curator import Curator
+from pylua_bioxen_vm_lib.lua_process import LuaProcess
+from pylua_bioxen_vm_lib.vm_manager import VMManager
+from pylua_bioxen_vm_lib.interactive_session import SessionManager
 
 # Setup environment
 env = EnvironmentManager(profile='standard')

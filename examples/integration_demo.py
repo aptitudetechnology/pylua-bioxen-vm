@@ -18,10 +18,10 @@ from typing import Dict, List, Any
 import traceback
 
 # Import actual components (fixed import paths)
-from pylua_vm.vm_manager import VMManager, LuaProcess
-from pylua_vm.curator import Curator, get_curator, bootstrap_lua_environment
-from pylua_vm.networking import NetworkedLuaVM
-from pylua_vm.interactive_session import SessionManager, InteractiveSession
+from pylua_bioxen_vm_lib.vm_manager import VMManager, LuaProcess
+from pylua_bioxen_vm_lib.curator import Curator, get_curator, bootstrap_lua_environment
+from pylua_bioxen_vm_lib.networking import NetworkedLuaVM
+from pylua_bioxen_vm_lib.interactive_session import SessionManager, InteractiveSession
 
 
 def print_section(title: str, char: str = "="):

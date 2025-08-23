@@ -4,10 +4,10 @@ Covers environment manager, LuaProcess curator integration, NetworkedLuaVM setup
 Mock testing for missing Lua/LuaRocks is excluded.
 """
 import unittest
-from pylua_vm.env import EnvironmentManager
-from pylua_vm.lua_process import LuaProcess
-from pylua_vm.networking import NetworkedLuaVM
-from pylua_vm.logger import VMLogger
+from pylua_bioxen_vm_lib.env import EnvironmentManager
+from pylua_bioxen_vm_lib.lua_process import LuaProcess
+from pylua_bioxen_vm_lib.networking import NetworkedLuaVM
+from pylua_bioxen_vm_lib.logger import VMLogger
 
 class TestIntegration(unittest.TestCase):
     def setUp(self):
