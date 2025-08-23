@@ -1,27 +1,27 @@
 """
-Integration Demo for pylua_bioxen_vm_lib
-Demonstrates the complete AGI bootstrapping workflow:
-- Environment setup and validation
-- Intelligent package curation
+Fixed Integration Demo for pylua_bioxen_vm_lib
+Demonstrates the complete AGI bootstrapping workflow using the ACTUAL implementation:
+- Environment setup and validation using VMManager
+- Intelligent package curation using the real Curator
 - VM creation with curator integration
 - Networking capabilities with automatic package management
 - Health monitoring and diagnostics
 - Error handling and recovery scenarios
 
-This demo embodies the curator philosophy of intelligent, discerning package management
-for AGI development.
+This demo uses the correct import paths and existing classes.
 """
 
 import sys
 import time
 from pathlib import Path
 from typing import Dict, List, Any
+import traceback
 
-# Import our components
-from pylua_vm.env import EnvironmentManager
-from pylua_vm.utils.curator import Curator, get_curator, bootstrap_lua_environment
-from pylua_vm.lua_process import LuaProcess
+# Import actual components (fixed import paths)
+from pylua_vm.vm_manager import VMManager, LuaProcess
+from pylua_vm.curator import Curator, get_curator, bootstrap_lua_environment
 from pylua_vm.networking import NetworkedLuaVM
+from pylua_vm.interactive_session import SessionManager, InteractiveSession
 
 
 def print_section(title: str, char: str = "="):
@@ -43,55 +43,39 @@ def print_status(message: str, status: str = "INFO"):
     print(f"{marker} {message}")
 
 
-def demo_environment_setup():
-    """Demonstrate environment manager capabilities"""
-    print_section("STEP 1: Environment Setup & Validation")
+def demo_vm_manager_setup():
+    """Demonstrate VMManager capabilities"""
+    print_section("STEP 1: VM Manager Setup & Validation")
     
-    # Test multiple profiles to show flexibility
-    profiles_to_test = ['minimal', 'standard', 'networking']
-    
-    for profile in profiles_to_test:
-        print(f"\n--- Testing {profile.title()} Profile ---")
-        
-        try:
-            # Create environment manager
-            env = EnvironmentManager(profile=profile, debug_mode=True)
-            print_status(f"Created EnvironmentManager with profile: {profile}")
-            
-            # Show environment info
-            print(f"  Lua executable: {env.lua_executable}")
-            print(f"  Profile: {env.profile}")
-            print(f"  Debug mode: {env.debug_mode}")
-            print(f"  Config path: {env.config_file}")
-            
-            # Validate environment
-            print_status("Validating environment...")
-            errors = env.validate_environment()
-            
-            if errors:
-                print_status(f"Validation found {len(errors)} issues:", "WARNING")
-                for error in errors[:3]:  # Show first 3 errors
-                    print(f"    - {error}")
-                if len(errors) > 3:
-                    print(f"    ... and {len(errors) - 3} more issues")
-            else:
-                print_status("Environment validation passed!", "SUCCESS")
-            
-            # Show system info
-            if hasattr(env, 'get_system_info'):
-                system_info = env.get_system_info()
-                print(f"  System: {system_info.get('platform', 'Unknown')}")
-                print(f"  Lua version: {system_info.get('lua_version', 'Unknown')}")
-            
-        except Exception as e:
-            print_status(f"Failed to setup {profile} environment: {e}", "ERROR")
-            continue
-    
-    # Return a working environment for subsequent demos
     try:
-        return EnvironmentManager(profile='standard', debug_mode=True)
+        # Create VM manager
+        manager = VMManager(max_vms=5, debug=True)
+        print_status(f"Created VMManager (max VMs: {manager.max_vms})")
+        
+        # Show manager capabilities
+        print(f"  Debug mode: {manager.debug}")
+        print(f"  Active VMs: {len(manager.get_active_vms())}")
+        
+        # Test basic VM creation
+        print_status("Testing basic VM creation...")
+        vm_id = manager.create_vm("demo_vm")
+        if vm_id:
+            print_status(f"Successfully created VM: {vm_id}", "SUCCESS")
+            
+            # Get VM info
+            vm_info = manager.get_vm_info(vm_id)
+            if vm_info:
+                print(f"  VM Status: {vm_info.get('status', 'unknown')}")
+                print(f"  VM PID: {vm_info.get('pid', 'unknown')}")
+        else:
+            print_status("Failed to create VM", "ERROR")
+            return None
+            
+        return manager
+        
     except Exception as e:
-        print_status(f"Could not create standard environment: {e}", "ERROR")
+        print_status(f"VM Manager setup failed: {e}", "ERROR")
+        traceback.print_exc()
         return None
 
 
@@ -151,218 +135,122 @@ def demo_curator_intelligence():
         print_status(f"Available profiles: {list(profiles.keys())}")
         
         # Try to curate a minimal environment
-        print_status("Attempting to curate 'minimal' profile...")
         if 'minimal' in profiles:
-            success = curator.curate_environment('minimal')
-            if success:
-                print_status("Minimal environment curation completed!", "SUCCESS")
-            else:
-                print_status("Curation encountered some issues", "WARNING")
+            print_status("Testing minimal profile curation...")
+            try:
+                success = curator.curate_environment('minimal')
+                if success:
+                    print_status("Minimal environment curation completed!", "SUCCESS")
+                else:
+                    print_status("Curation encountered some issues", "WARNING")
+            except Exception as e:
+                print_status(f"Curation failed: {e}", "ERROR")
         
         return curator
         
     except Exception as e:
         print_status(f"Curator demo failed: {e}", "ERROR")
+        traceback.print_exc()
         return None
 
 
-def demo_vm_integration(env_manager, curator):
-    """Demonstrate VM creation with curator integration"""
-    print_section("STEP 3: VM Creation with Curator Integration")
+def demo_lua_process_integration(manager, curator):
+    """Demonstrate LuaProcess creation and integration"""
+    print_section("STEP 3: Lua Process Integration")
     
-    if not env_manager:
-        print_status("Skipping VM demo - no environment manager", "WARNING")
+    if not manager:
+        print_status("Skipping LuaProcess demo - no manager", "WARNING")
         return None
     
     try:
-        # Create basic VM with curator integration
-        print_status("Creating LuaProcess with curator integration...")
-        vm = LuaProcess(
-            name=f"AGI-{env_manager.profile.title()}",
-            lua_executable=env_manager.lua_executable,
-            debug_mode=env_manager.debug_mode
-        )
+        # Create Lua process using the manager
+        print_status("Creating LuaProcess...")
         
-        print_status(f"Created VM: {vm.name}")
-        print(f"  Lua path: {vm.lua_executable}")
-        print(f"  Debug mode: {vm.debug_mode}")
+        # Get available VMs from manager
+        active_vms = manager.get_active_vms()
+        if active_vms:
+            vm_id = active_vms[0]
+            print_status(f"Using existing VM: {vm_id}")
+        else:
+            vm_id = manager.create_vm("lua_process_demo")
+            if not vm_id:
+                print_status("Failed to create VM for LuaProcess", "ERROR")
+                return None
         
-        # Test curator integration methods
-        print("\n--- Curator Integration Methods ---")
-        
-        # Setup packages using curator
-        print_status("Setting up packages using curator...")
-        try:
-            result = vm.setup_packages(env_manager.profile)
-            print_status(f"Package setup result: {result.get('success', False)}", 
-                        "SUCCESS" if result.get('success') else "WARNING")
-            
-            if 'packages_installed' in result:
-                print(f"  Packages installed: {len(result['packages_installed'])}")
-                for pkg in result['packages_installed'][:3]:
-                    print(f"    - {pkg}")
-        except Exception as e:
-            print_status(f"Package setup failed: {e}", "ERROR")
-        
-        # Get package recommendations through VM
-        print_status("Getting package recommendations through VM...")
-        try:
-            recommendations = vm.get_package_recommendations()
-            print(f"  VM recommends {len(recommendations)} packages")
-        except Exception as e:
-            print_status(f"Failed to get recommendations: {e}", "ERROR")
-        
-        # Check environment health through VM
-        print_status("Checking environment health through VM...")
-        try:
-            health = vm.check_environment_health()
-            if health:
-                print(f"  Health check completed - {len(health)} metrics")
-                # Show key health indicators
-                for key in ['luarocks_available', 'installed_packages', 'critical_packages_ratio']:
-                    if key in health:
-                        print(f"    {key}: {health[key]}")
-        except Exception as e:
-            print_status(f"Health check failed: {e}", "ERROR")
-        
-        # Test basic Lua execution
+        # Test basic Lua execution through manager
         print("\n--- Basic Lua Execution Test ---")
         try:
             print_status("Testing basic Lua execution...")
             
-            # Simple test
-            result = vm.execute_lua('return "Hello from AGI Lua VM!"')
+            # Simple math test
+            result = manager.execute_lua(vm_id, 'return math.sqrt(16)')
             if result and result.get('success'):
-                print_status(f"Execution successful: {result.get('result')}", "SUCCESS")
+                print_status(f"Math test: {result.get('output', 'No output')}", "SUCCESS")
             else:
-                print_status(f"Execution failed: {result.get('error', 'Unknown error')}", "ERROR")
+                print_status(f"Math test failed: {result.get('error') if result else 'No result'}", "ERROR")
             
-            # Test with curator-installed packages (if lua-cjson is available)
+            # String manipulation test
+            result = manager.execute_lua(vm_id, 'return "Hello from " .. "Lua VM!"')
+            if result and result.get('success'):
+                print_status(f"String test: {result.get('output', 'No output')}", "SUCCESS")
+            else:
+                print_status(f"String test failed: {result.get('error') if result else 'No result'}", "ERROR")
+                
+        except Exception as e:
+            print_status(f"Lua execution test failed: {e}", "ERROR")
+        
+        # Test package usage if curator is available
+        if curator:
+            print("\n--- Package Integration Test ---")
             print_status("Testing curator-installed package usage...")
+            
+            # Test JSON package if available
             json_test = '''
             local ok, json = pcall(require, "cjson")
             if ok then
-                local data = {message = "Curator package working!", packages = {"lua-cjson", "penlight"}}
+                local data = {message = "Curator package working!", system = "AGI Bootstrap"}
                 return json.encode(data)
             else
                 return "lua-cjson not available"
             end
             '''
             
-            result = vm.execute_lua(json_test)
+            result = manager.execute_lua(vm_id, json_test)
             if result and result.get('success'):
-                print_status(f"Package test: {result.get('result')}", "SUCCESS")
+                output = result.get('output', 'No output')
+                if 'Curator package working!' in output:
+                    print_status(f"Package integration: SUCCESS", "SUCCESS")
+                else:
+                    print_status(f"Package test: {output}")
             else:
-                print_status(f"Package test result: {result.get('result', 'Package not available')}")
-                
-        except Exception as e:
-            print_status(f"Lua execution test failed: {e}", "ERROR")
+                print_status(f"Package test failed: {result.get('error') if result else 'No result'}")
         
-        return vm
+        return vm_id
         
     except Exception as e:
-        print_status(f"VM integration demo failed: {e}", "ERROR")
+        print_status(f"LuaProcess integration demo failed: {e}", "ERROR")
+        traceback.print_exc()
         return None
 
 
-def demo_networking_vm(env_manager):
-    """Demonstrate networked VM with automatic package management"""
-    print_section("STEP 4: Networked VM with Automatic Package Management")
+def demo_networking_vm(manager):
+    """Demonstrate NetworkedLuaVM capabilities"""
+    print_section("STEP 4: Networked VM Capabilities")
     
-    if not env_manager:
-        print_status("Skipping networking demo - no environment manager", "WARNING")
+    if not manager:
+        print_status("Skipping networking demo - no manager", "WARNING")
         return None
     
     try:
         # Create networked VM
         print_status("Creating NetworkedLuaVM...")
-        net_vm = NetworkedLuaVM(
-            name="AGI-Network",
-            lua_executable=env_manager.lua_executable,
-            debug_mode=True
-        )
         
+        # NetworkedLuaVM should work with manager integration
+        net_vm = NetworkedLuaVM(name="AGI-Network", debug=True)
         print_status(f"Created networked VM: {net_vm.name}")
         
-        # Setup networking packages automatically
-        print("\n--- Automatic Networking Package Setup ---")
-        print_status("Setting up networking packages with curator...")
-        
-        try:
-            result = net_vm.setup_networking_packages(include_advanced=True)
-            
-            print_status(f"Networking setup completed", 
-                        "SUCCESS" if result.get('success', False) else "WARNING")
-            
-            if 'packages_installed' in result:
-                print(f"  Networking packages: {len(result['packages_installed'])}")
-                for pkg in result['packages_installed']:
-                    print(f"    - {pkg}")
-            
-            print(f"  Networking ready: {result.get('networking_ready', False)}")
-            
-        except Exception as e:
-            print_status(f"Networking setup failed: {e}", "ERROR")
-        
-        # Get networking-specific recommendations
-        print("\n--- Networking Package Recommendations ---")
-        try:
-            net_recommendations = net_vm.get_networking_recommendations()
-            
-            if net_recommendations:
-                print_status(f"Found {len(net_recommendations)} networking recommendations:")
-                
-                # Group by networking category
-                by_category = {}
-                for rec in net_recommendations:
-                    cat = rec.get('networking_category', 'utility')
-                    if cat not in by_category:
-                        by_category[cat] = []
-                    by_category[cat].append(rec)
-                
-                for category, recs in sorted(by_category.items()):
-                    print(f"\n  {category.upper()}:")
-                    for rec in recs:
-                        print(f"    - {rec['package']}: {rec['description']}")
-            else:
-                print_status("No networking recommendations available")
-                
-        except Exception as e:
-            print_status(f"Failed to get networking recommendations: {e}", "ERROR")
-        
-        # Comprehensive networking health check
-        print("\n--- Networking Health Diagnostics ---")
-        try:
-            health = net_vm.check_networking_health()
-            
-            if health:
-                print_status("Networking health check completed")
-                
-                # Show key networking metrics
-                if 'networking' in health:
-                    net_health = health['networking']
-                    readiness = net_health.get('networking_readiness_percentage', 0)
-                    print(f"  Networking readiness: {readiness}%")
-                    
-                    if 'luasocket_available' in net_health:
-                        status = "Available" if net_health['luasocket_available'] else "Not Available"
-                        print(f"  LuaSocket: {status}")
-                    
-                    if 'http_client_ready' in net_health:
-                        status = "Ready" if net_health['http_client_ready'] else "Not Ready"
-                        print(f"  HTTP Client: {status}")
-                
-                # Show overall system health
-                if 'system' in health:
-                    sys_health = health['system']
-                    print(f"  System packages: {sys_health.get('installed_packages', 0)}")
-                    print(f"  LuaRocks: {sys_health.get('luarocks_available', 'Unknown')}")
-        
-        except Exception as e:
-            print_status(f"Networking health check failed: {e}", "ERROR")
-        
-        # Test networking capabilities
-        print("\n--- Networking Capability Test ---")
+        # Test basic networking setup
+        print("\n--- Networking Setup Test ---")
         try:
             # Test LuaSocket availability
             socket_test = '''
@@ -374,190 +262,281 @@ def demo_networking_vm(env_manager):
             end
             '''
             
-            result = net_vm.execute_lua(socket_test)
+            result = net_vm.execute(socket_test)
             if result and result.get('success'):
-                print_status(f"Socket test: {result.get('result')}", "SUCCESS")
+                output = result.get('output', result.get('result', 'No output'))
+                print_status(f"Socket test: {output}", "SUCCESS" if "available" in output else "WARNING")
             else:
-                print_status(f"Socket test failed: {result.get('error', 'Unknown error')}", "ERROR")
+                print_status(f"Socket test failed: {result.get('error') if result else 'No result'}", "ERROR")
         
         except Exception as e:
             print_status(f"Networking test failed: {e}", "ERROR")
+        
+        # Test networking configuration
+        print("\n--- Network Configuration Test ---")
+        try:
+            # Test host validation
+            from pylua_vm.networking import validate_host, validate_port
+            
+            test_hosts = ["localhost", "127.0.0.1", "invalid-host-name-123"]
+            for host in test_hosts:
+                is_valid = validate_host(host)
+                status = "SUCCESS" if is_valid else "WARNING"
+                print_status(f"Host '{host}': {'Valid' if is_valid else 'Invalid'}", status)
+            
+            # Test port validation
+            test_ports = [8080, 80, 443, 65536, -1]
+            for port in test_ports:
+                is_valid = validate_port(port)
+                status = "SUCCESS" if is_valid else "WARNING"
+                print_status(f"Port {port}: {'Valid' if is_valid else 'Invalid'}", status)
+                
+        except Exception as e:
+            print_status(f"Network configuration test failed: {e}", "ERROR")
         
         return net_vm
         
     except Exception as e:
         print_status(f"Networking VM demo failed: {e}", "ERROR")
+        traceback.print_exc()
         return None
 
 
-def demo_error_scenarios():
+def demo_interactive_sessions(manager):
+    """Demonstrate InteractiveSession capabilities"""
+    print_section("STEP 5: Interactive Session Management")
+    
+    if not manager:
+        print_status("Skipping interactive demo - no manager", "WARNING")
+        return None
+    
+    try:
+        # Create session manager
+        session_mgr = SessionManager()
+        print_status("Created SessionManager")
+        
+        # Get or create a VM for interactive session
+        active_vms = manager.get_active_vms()
+        if active_vms:
+            vm_id = active_vms[0]
+        else:
+            vm_id = manager.create_vm("interactive_demo")
+            if not vm_id:
+                print_status("Failed to create VM for interactive session", "ERROR")
+                return None
+        
+        print_status(f"Using VM: {vm_id}")
+        
+        # Test session creation
+        print("\n--- Session Creation Test ---")
+        try:
+            # Note: InteractiveSession might need different parameters
+            # This is a basic test to see what's available
+            print_status("Testing session creation capabilities...")
+            
+            # Show available session methods
+            session_methods = [method for method in dir(InteractiveSession) if not method.startswith('_')]
+            print(f"  Available session methods: {len(session_methods)}")
+            for method in session_methods[:5]:  # Show first 5
+                print(f"    - {method}")
+            if len(session_methods) > 5:
+                print(f"    ... and {len(session_methods) - 5} more methods")
+                
+            # Show session manager methods  
+            mgr_methods = [method for method in dir(session_mgr) if not method.startswith('_')]
+            print(f"  Session manager methods: {len(mgr_methods)}")
+            for method in mgr_methods[:5]:  # Show first 5
+                print(f"    - {method}")
+                
+        except Exception as e:
+            print_status(f"Session exploration failed: {e}", "ERROR")
+        
+        return session_mgr
+        
+    except Exception as e:
+        print_status(f"Interactive session demo failed: {e}", "ERROR")
+        traceback.print_exc()
+        return None
+
+
+def demo_error_scenarios(manager, curator):
     """Demonstrate error handling and recovery scenarios"""
-    print_section("STEP 5: Error Handling & Recovery Scenarios")
+    print_section("STEP 6: Error Handling & Recovery Scenarios")
     
     print_status("Testing error handling capabilities...")
     
-    # Test 1: Invalid profile
-    print("\n--- Invalid Profile Handling ---")
-    try:
-        env = EnvironmentManager(profile='nonexistent', debug_mode=True)
-        print_status("Created environment with invalid profile - this should have failed", "WARNING")
-    except Exception as e:
-        print_status(f"Correctly handled invalid profile: {e}", "SUCCESS")
-    
-    # Test 2: Package installation failure
-    print("\n--- Package Installation Error Handling ---")
-    try:
-        curator = get_curator()
-        success = curator.install_package('nonexistent-package-12345')
-        if success:
-            print_status("Installation of fake package succeeded - unexpected!", "WARNING")
-        else:
-            print_status("Correctly handled invalid package installation", "SUCCESS")
-    except Exception as e:
-        print_status(f"Exception during package installation: {e}")
-    
-    # Test 3: VM execution error
-    print("\n--- VM Execution Error Handling ---")
-    try:
-        env = EnvironmentManager(profile='minimal', debug_mode=True)
-        vm = LuaProcess(name="ErrorTest", lua_executable=env.lua_executable)
-        
-        # Execute invalid Lua code
-        result = vm.execute_lua('this is not valid lua code!')
-        
-        if result:
-            if result.get('success'):
-                print_status("Invalid Lua code executed successfully - unexpected!", "WARNING")
+    # Test 1: Invalid VM operations
+    print("\n--- Invalid VM Operations ---")
+    if manager:
+        try:
+            # Try to execute on non-existent VM
+            result = manager.execute_lua("nonexistent-vm-id", "return 42")
+            if result and result.get('success'):
+                print_status("Executed on invalid VM - this should have failed", "WARNING")
             else:
-                error_msg = result.get('error', 'Unknown error')
-                print_status(f"Correctly handled Lua error: {error_msg[:100]}...", "SUCCESS")
-        else:
-            print_status("VM execution returned None - handled gracefully", "SUCCESS")
-            
-    except Exception as e:
-        print_status(f"Exception during VM execution test: {e}")
+                print_status("Correctly handled invalid VM operation", "SUCCESS")
+        except Exception as e:
+            print_status(f"Exception during invalid VM test: {e}")
+    
+    # Test 2: Invalid Lua code
+    print("\n--- Invalid Lua Code Handling ---")
+    if manager:
+        active_vms = manager.get_active_vms()
+        if active_vms:
+            vm_id = active_vms[0]
+            try:
+                result = manager.execute_lua(vm_id, 'this is not valid lua code!')
+                if result and result.get('success'):
+                    print_status("Invalid Lua executed successfully - unexpected!", "WARNING")
+                else:
+                    error_msg = result.get('error', 'Unknown error') if result else 'No result'
+                    print_status(f"Correctly handled Lua error: {error_msg[:100]}...", "SUCCESS")
+            except Exception as e:
+                print_status(f"Exception during Lua error test: {e}")
+    
+    # Test 3: Package installation failure
+    print("\n--- Package Installation Error Handling ---")
+    if curator:
+        try:
+            success = curator.install_package('nonexistent-package-12345')
+            if success:
+                print_status("Installation of fake package succeeded - unexpected!", "WARNING")
+            else:
+                print_status("Correctly handled invalid package installation", "SUCCESS")
+        except Exception as e:
+            print_status(f"Exception during package installation: {e}")
 
 
 def demo_complete_workflow():
     """Demonstrate complete AGI bootstrapping workflow"""
-    print_section("STEP 6: Complete AGI Bootstrapping Workflow")
+    print_section("STEP 7: Complete AGI Bootstrapping Workflow")
     
     print_status("Demonstrating complete AGI development workflow...")
     
     try:
-        # 1. Environment Detection and Setup
+        # 1. Environment Bootstrap
         print("\n--- Automated Environment Bootstrap ---")
-        success = bootstrap_lua_environment(profile='development')
+        try:
+            success = bootstrap_lua_environment(profile='standard')
+            if success:
+                print_status("AGI environment bootstrap completed!", "SUCCESS")
+            else:
+                print_status("Bootstrap encountered issues but continued", "WARNING")
+        except Exception as e:
+            print_status(f"Bootstrap failed: {e}", "ERROR")
         
-        if success:
-            print_status("AGI environment bootstrap completed!", "SUCCESS")
-        else:
-            print_status("Bootstrap encountered issues but continued", "WARNING")
+        # 2. Create production-ready setup
+        print("\n--- Production Setup ---")
+        manager = VMManager(max_vms=3, debug=False)  # Production mode
+        curator = get_curator()
         
-        # 2. Create production-ready VM
-        print("\n--- Production VM Setup ---")
-        env = EnvironmentManager(profile='full', debug_mode=False)  # Production mode
+        # Create VMs for different purposes
+        main_vm_id = manager.create_vm("AGI-Main")
+        worker_vm_id = manager.create_vm("AGI-Worker")
         
-        # Create both regular and networked VMs
-        main_vm = LuaProcess(name="AGI-Main", lua_executable=env.lua_executable)
-        network_vm = NetworkedLuaVM(name="AGI-Network", lua_executable=env.lua_executable)
-        
-        # Setup both VMs with appropriate packages
-        main_result = main_vm.setup_packages('full')
-        network_result = network_vm.setup_networking_packages(include_advanced=True)
-        
-        print_status(f"Main VM setup: {'Success' if main_result.get('success') else 'Partial'}")
-        print_status(f"Network VM setup: {'Success' if network_result.get('success') else 'Partial'}")
+        print_status(f"Created main VM: {main_vm_id}")
+        print_status(f"Created worker VM: {worker_vm_id}")
         
         # 3. Demonstrate coordinated operation
         print("\n--- Coordinated VM Operation ---")
         
-        # Main VM: Data processing
-        data_processing = '''
-        local inspect = require("inspect")
-        local data = {
-            system = "AGI Bootstrapping Demo",
-            timestamp = os.time(),
-            components = {"environment", "curator", "vm", "networking"},
-            status = "operational"
-        }
-        return inspect(data)
-        '''
-        
-        main_result = main_vm.execute_lua(data_processing)
-        if main_result and main_result.get('success'):
-            print_status("Main VM data processing: SUCCESS", "SUCCESS")
-            print(f"  Result: {main_result.get('result', '')[:100]}...")
-        
-        # Network VM: Capability check
-        network_check = '''
-        local socket = require("socket")
-        return "Network VM operational - Socket version: " .. (socket.VERSION or "unknown")
-        '''
-        
-        network_result = network_vm.execute_lua(network_check)
-        if network_result and network_result.get('success'):
-            print_status("Network VM capability check: SUCCESS", "SUCCESS")
-            print(f"  Result: {network_result.get('result', '')}")
+        if main_vm_id and worker_vm_id:
+            # Main VM: Data processing
+            main_task = '''
+            local data = {
+                system = "AGI Bootstrapping Demo",
+                timestamp = os.time(),
+                components = {"vm_manager", "curator", "networking", "interactive"},
+                status = "operational"
+            }
+            return "Main VM processed " .. #data.components .. " components"
+            '''
+            
+            result = manager.execute_lua(main_vm_id, main_task)
+            if result and result.get('success'):
+                print_status(f"Main VM: {result.get('output', 'No output')}", "SUCCESS")
+            
+            # Worker VM: Computation
+            worker_task = '''
+            local sum = 0
+            for i = 1, 100 do
+                sum = sum + i
+            end
+            return "Worker VM computed sum: " .. sum
+            '''
+            
+            result = manager.execute_lua(worker_vm_id, worker_task)
+            if result and result.get('success'):
+                print_status(f"Worker VM: {result.get('output', 'No output')}", "SUCCESS")
         
         print_status("AGI bootstrapping workflow completed!", "SUCCESS")
         
     except Exception as e:
         print_status(f"Complete workflow demo failed: {e}", "ERROR")
+        traceback.print_exc()
 
 
 def main():
     """Main integration demo"""
-    print_section("PyLua VM AGI Bootstrapping Integration Demo", "=")
+    print_section("PyLua VM AGI Bootstrapping Integration Demo (FIXED)", "=")
     
-    print("This demo showcases the complete AGI bootstrapping system:")
-    print("• Intelligent environment management")  
-    print("• Curator-based package curation")
-    print("• Integrated VM creation and management")
-    print("• Automated networking setup")
-    print("• Comprehensive health monitoring")
-    print("• Error handling and recovery")
+    print("This demo showcases the complete AGI bootstrapping system using REAL components:")
+    print("• VMManager for VM orchestration")  
+    print("• Curator for intelligent package management")
+    print("• LuaProcess integration")
+    print("• NetworkedLuaVM capabilities")
+    print("• InteractiveSession management")
+    print("• Comprehensive error handling")
     print("")
     
     start_time = time.time()
     
-    # Run demonstration steps
-    env_manager = demo_environment_setup()
+    # Run demonstration steps with actual components
+    manager = demo_vm_manager_setup()
     curator = demo_curator_intelligence() 
-    vm = demo_vm_integration(env_manager, curator)
-    network_vm = demo_networking_vm(env_manager)
-    demo_error_scenarios()
+    vm_id = demo_lua_process_integration(manager, curator)
+    net_vm = demo_networking_vm(manager)
+    session_mgr = demo_interactive_sessions(manager)
+    demo_error_scenarios(manager, curator)
     demo_complete_workflow()
     
     # Final summary
-    print_section("Demo Summary & Next Steps")
+    print_section("Demo Summary & System Status")
     
     duration = time.time() - start_time
     print_status(f"Integration demo completed in {duration:.2f} seconds")
     
-    print("\n--- System Status ---")
-    if env_manager:
-        print_status(f"Environment: {env_manager.profile} profile ready", "SUCCESS")
+    print("\n--- Component Status ---")
+    if manager:
+        active_vms = manager.get_active_vms()
+        print_status(f"VMManager: {len(active_vms)} active VMs", "SUCCESS")
+        
+        # Clean up VMs
+        try:
+            manager.shutdown_all()
+            print_status("All VMs shut down cleanly", "SUCCESS")
+        except Exception as e:
+            print_status(f"Shutdown warning: {e}", "WARNING")
     
     if curator:
         health = curator.health_check()
         packages = len(curator.list_installed_packages())
-        print_status(f"Curator: {packages} packages managed", "SUCCESS")
+        print_status(f"Curator: {packages} packages managed, LuaRocks: {health.get('luarocks_available', 'unknown')}", "SUCCESS")
     
-    if vm:
-        print_status(f"Main VM: {vm.name} operational", "SUCCESS")
+    if net_vm:
+        print_status(f"NetworkedLuaVM: {net_vm.name} tested", "SUCCESS")
     
-    if network_vm:
-        print_status(f"Network VM: {network_vm.name} operational", "SUCCESS")
+    if session_mgr:
+        print_status("SessionManager: Interactive capabilities available", "SUCCESS")
     
     print("\n--- What You Can Do Next ---")
-    print("• Use the CLI: python -m pylua_vm.cli --interactive")
-    print("• Create custom profiles with specific package sets") 
-    print("• Develop Lua scripts using the curated package ecosystem")
-    print("• Build networked applications with automatic dependency management")
-    print("• Monitor system health and get intelligent package recommendations")
+    print("• Use the CLI: python -m pylua_vm.cli --interactive") 
+    print("• Create VMs: manager = VMManager(); vm_id = manager.create_vm('my_vm')")
+    print("• Curate packages: curator = get_curator(); curator.curate_environment('standard')")
+    print("• Network VMs: net_vm = NetworkedLuaVM(name='network_test')")
+    print("• Interactive sessions: session = InteractiveSession(...)")
     
-    print_section("Packaing System Ready!", "=")
+    print_section("AGI System Ready!", "=")
 
 
 if __name__ == "__main__":
@@ -568,6 +547,5 @@ if __name__ == "__main__":
         sys.exit(130)
     except Exception as e:
         print(f"\n\nDemo failed with unexpected error: {e}")
-        import traceback
         traceback.print_exc()
         sys.exit(1)
