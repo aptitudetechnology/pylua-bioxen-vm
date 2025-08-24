@@ -81,7 +81,7 @@ class EnvironmentManager:
             debug_mode: Enable debug logging
         """
         self.profile = profile
-        self.config_path = Path(config_path) if config_path else self._default_config_path()
+        
         self.debug_mode = debug_mode
         self.logger = VMLogger(debug_mode=debug_mode, component="EnvironmentManager")
         
@@ -90,6 +90,9 @@ class EnvironmentManager:
         self.machine = platform.machine()
         self.python_version = platform.python_version()
         
+        # config path
+        self.config_path = Path(config_path) if config_path else self._default_config_path()
+
         # Lua detection
         self.lua_executable = self._find_lua_executable()
         self.lua_version = self._detect_lua_version()
