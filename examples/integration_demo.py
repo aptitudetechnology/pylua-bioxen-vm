@@ -19,7 +19,7 @@ import traceback
 
 # Import actual components (fixed import paths)
 from pylua_bioxen_vm_lib.vm_manager import VMManager, LuaProcess
-from pylua_bioxen_vm_lib.curator import Curator, get_curator, bootstrap_lua_environment
+from pylua_bioxen_vm_lib.utils.curator import Curator
 from pylua_bioxen_vm_lib.networking import NetworkedLuaVM
 from pylua_bioxen_vm_lib.interactive_session import SessionManager, InteractiveSession
 
