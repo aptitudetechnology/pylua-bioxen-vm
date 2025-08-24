@@ -160,7 +160,12 @@ atform.python_version()
             self.logger.debug(f"Failed to detect Lua version: {e}")
             return None
     
-    def _detect_luarocks_version(self) -> Optional[str]:
+                self.debug_mode = debug_mode
+                # System information (MOVED UP HERE!)
+                self.system = platform.system()
+                self.machine = platform.machine()
+                self.python_version = platform.python_version()
+                # NOW config_path can work because self.system exists
         """Detect LuaRocks version."""
         try:
             self.logger.debug("Detecting LuaRocks version")
