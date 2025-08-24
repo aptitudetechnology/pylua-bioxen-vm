@@ -78,9 +78,12 @@ class Curator:
 
     def __init__(self, lua_path: str = None, manifest_path: str = None):
         """Initialize the curator with environment configuration"""
+        # Set up logging FIRST
+        self.logger = self._setup_logging()
+        
+        # NOW we can call methods that use the logger
         self.lua_path = lua_path or self._detect_lua_path()
         self.manifest_path = Path(manifest_path) if manifest_path else Path("manifest.json")
-        self.logger = self._setup_logging()
         
         # Load or create manifest
         self.manifest = self._load_manifest()

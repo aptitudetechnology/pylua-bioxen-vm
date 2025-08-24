@@ -1,4 +1,147 @@
-❌ Import error: No module named 'pylua_bioxen_vm_lib'
-Please ensure pylua_bioxen_vm_lib is properly installed and try:
-  pip install -e .  (if in development)
-  OR check your diagnostic script results
+
+5. Testing Interactive Session Lifecycle
+❌ Interactive Session failed: name 'VMManager' is not defined
+
+6. Testing Session Manager
+❌ Registry operations failed: name 'SessionManager' is not defined
+
+9. Testing Complex Interactive Session
+❌ Complex session failed: name 'VMManager' is not defined
+
+10. Testing Session Reattachment
+❌ Session reattachment failed: name 'VMManager' is not defined
+
+==================================================
+Installation test complete!
+All features tested for pylua_bioxen_vm_lib interactive support
+✅ Successfully imported all pylua_bioxen_vm_lib components
+
+============================================================
+      PyLua Bioxen VM Lib - Complete Integration Demo       
+============================================================
+
+This demo showcases the complete system using CORRECTED imports:
+✅ VMManager for VM orchestration
+✅ LuaProcess integration
+✅ NetworkedLuaVM capabilities
+✅ InteractiveSession management
+✅ Comprehensive error handling
+✅ System health monitoring
+
+
+============================================================
+           STEP 1: VM Manager Setup & Validation            
+============================================================
+
+ℹ️ Creating VMManager...
+✅ VMManager created successfully!
+  Available methods: 33
+  Key methods available: ['create_vm', 'list_vms', 'get_vm_status', 'shutdown_all']
+ℹ️ Testing basic VM creation...
+✅ Successfully created VM: LuaProcess(name='demo_vm', lua_executable='lua', debug_mode=False, packages_setup=False)
+  VM Status: None
+
+============================================================
+              STEP 2: Lua Process Integration               
+============================================================
+
+ℹ️ Testing Lua execution capabilities...
+  Currently active VMs: 1
+
+--- Basic Lua Execution Test ---
+❌ Lua execution test failed: VM 'LuaProcess(name='lua_test_vm', lua_executable='lua', debug_mode=False, packages_setup=False)' not found
+
+============================================================
+              STEP 3: Networking Capabilities               
+============================================================
+
+ℹ️ Testing networking components...
+
+--- Network Validation Test ---
+⚠️ Host 'localhost': Invalid
+⚠️ Host '127.0.0.1': Invalid
+⚠️ Host 'invalid-host': Invalid
+⚠️ Port 8080: Invalid
+❌ Port validation failed for 80: Port must be between 1024 and 65535
+❌ Port validation failed for 443: Port must be between 1024 and 65535
+❌ Port validation failed for 65536: Port must be between 1024 and 65535
+❌ Port validation failed for -1: Port must be between 1024 and 65535
+
+--- NetworkedLuaVM Creation Test ---
+✅ Created NetworkedLuaVM: test_network_vm
+  Available methods: 21
+  Network methods: ['start_server']
+
+============================================================
+           STEP 4: Interactive Session Management           
+============================================================
+
+ℹ️ Testing interactive session components...
+
+--- SessionManager Test ---
+✅ Created SessionManager successfully
+  Available methods: 6
+  Session management methods: ['create_session', 'list_sessions', 'get_session', 'remove_session']
+
+--- InteractiveSession Test ---
+ℹ️ Created VM for interactive session: LuaProcess(name='interactive_test', lua_executable='lua', debug_mode=False, packages_setup=False)
+  InteractiveSession parameters: ['session_id', 'vm_instance', 'lua_executable', 'debug_mode']
+❌ InteractiveSession creation failed: InteractiveSession.__init__() missing 2 required positional arguments: 'session_id' and 'vm_instance'
+
+============================================================
+             STEP 5: Error Handling & Recovery              
+============================================================
+
+ℹ️ Testing error handling capabilities...
+
+--- Exception Types Test ---
+  VMManagerError: Available
+  LuaProcessError: Available
+  NetworkingError: Available
+  InteractiveSessionError: Available
+  LuaVMError: Available
+
+--- Invalid Operations Test ---
+⚠️ Invalid VM status check: None
+ℹ️ Error handling test: ValueError: VM 'invalid-vm' not found
+
+============================================================
+                STEP 6: System Health Check                 
+============================================================
+
+ℹ️ Performing comprehensive health check...
+
+--- Import Health ---
+✅ VMManager: Instantiable
+⚠️ InteractiveSession: TypeError
+✅ SessionManager: Instantiable
+✅ NetworkedLuaVM: Instantiable
+✅ LuaProcess: Instantiable
+
+--- System Requirements ---
+✅ Lua interpreter: /usr/bin/lua
+✅ LuaRocks: /usr/bin/luarocks
+
+============================================================
+                Demo Summary & System Status                
+============================================================
+
+✅ Integration demo completed in 0.01 seconds
+
+--- Final Component Status ---
+✅ VMManager: 3 active VMs
+✅ All VMs shut down cleanly
+✅ NetworkedLuaVM: Networking capabilities tested
+✅ InteractiveSession: Session management tested
+✅ Error Handling: Exception types available
+
+--- What You Can Do Next ---
+• Create VMs: manager = VMManager(); vm_id = manager.create_vm('my_vm')
+• Network VMs: net_vm = NetworkedLuaVM(name='network_test')
+• Interactive sessions: session = InteractiveSession(...)
+• Explore methods: dir(manager) to see all available methods
+
+============================================================
+                System Integration Complete!                
+============================================================
+
