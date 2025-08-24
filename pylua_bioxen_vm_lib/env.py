@@ -82,16 +82,21 @@ class EnvironmentManager:
         """
         self.profile = profile
         
+        self.system = platform.system()
+        self.machine = platform.machine()
+        self.python_version = platform.python_version()
+
         self.debug_mode = debug_mode
-        self.logger = VMLogger(debug_mode=debug_mode, component="EnvironmentManager")
         
         # System information
         self.system = platform.system()
         self.machine = platform.machine()
-        self.python_version = platform.python_version()
+        self.python_version = pl        self.logger = VMLogger(debug_mode=debug_mode, component="EnvironmentManager")
+atform.python_version()
         
         # config path
         self.config_path = Path(config_path) if config_path else self._default_config_path()
+        self.logger = VMLogger(debug_mode=debug_mode, component="EnvironmentManager")
 
         # Lua detection
         self.lua_executable = self._find_lua_executable()
