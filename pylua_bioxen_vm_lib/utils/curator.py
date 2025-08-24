@@ -80,21 +80,21 @@ class Curator:
         """Initialize the curator with environment configuration"""
         # Set up logging FIRST
         self.logger = self._setup_logging()
-        
-        # NOW we can call methods that use the logger
-        self.lua_path = lua_path or self._detect_lua_path()
-        self.manifest_path = Path(manifest_path) if manifest_path else Path("manifest.json")
-        
-        # Load or create manifest
-        self.manifest = self._load_manifest()
-        
-        # Combined package catalog
+
+        # Set up catalog BEFORE loading manifest (since _load_manifest uses it)
         self.catalog = {
             **self.CORE_PACKAGES,
             **self.NETWORKING_PACKAGES, 
             **self.PARSING_PACKAGES,
             **self.TESTING_PACKAGES
         }
+
+        # NOW we can call methods that use the logger and catalog
+        self.lua_path = lua_path or self._detect_lua_path()
+        self.manifest_path = Path(manifest_path) if manifest_path else Path("manifest.json")
+
+        # Load or create manifest (this needs self.catalog to exist)
+        self.manifest = self._load_manifest()
     
     def _setup_logging(self) -> logging.Logger:
         """Setup intelligent logging system"""
