@@ -1,79 +1,149 @@
-# pylua_bioxen_vm_lib Specification Compliance Report
+# pylua_bioxen_vm_lib Audit Report (Spec vs Codebase)
 
-## Overview
-This report compares the updated specification in `pylua_bioxen_vm_lib_specification.markdown` (development branch) against the actual codebase.
+## 1. Import Dependencies Validation - Status: MATCHES
+
+**Actual Implementation:**
+```python
+from pylua_bioxen_vm_lib.vm_manager import VMCluster
+from pylua_bioxen_vm_lib.networking import NetworkedLuaVM, validate_host, validate_port
+# These are present in __init__.py and vm_manager.py
+```
+**CLI Script Expects:**
+```python
+from pylua_bioxen_vm_lib.vm_manager import VMCluster
+from pylua_bioxen_vm_lib.networking import NetworkedLuaVM, validate_host, validate_port
+from pkgdict.bioxen_packages import ALL_PACKAGES, BIOXEN_PACKAGES
+from pkgdict.bioxen_profiles import ALL_PROFILES, BIOXEN_PROFILES, PROFILE_CATEGORIES
+```
+**Specification Claims:**
+- No explicit mention of pkgdict imports; package/profile constants are not found in codebase.
+
+**Resolution Required:**
+- [x] Update CLI script to use actual import paths for VMCluster, NetworkedLuaVM, validate_host, validate_port
+- [ ] Implement or document ALL_PACKAGES, BIOXEN_PACKAGES, ALL_PROFILES, BIOXEN_PROFILES, PROFILE_CATEGORIES if needed
+
+## 2. Exception Classes Verification - Status: MATCHES
+
+**Actual Implementation:**
+```python
+class LuaProcessError(LuaVMError)
+class NetworkingError(LuaVMError)
+class ProcessRegistryError(VMManagerError)
+# All present in exceptions.py
+```
+**CLI Script Expects:**
+ProcessRegistryError, LuaProcessError, NetworkingError
+**Specification Claims:**
+- Exception classes are listed and present in codebase.
+
+**Resolution Required:**
+- [x] No action needed; all exceptions exist
+
+## 3. VMManager API Surface Area - Status: PARTIAL MATCH
+
+**Actual Implementation:**
+```python
+def create_interactive_vm(vm_id: str, ...)
+def attach_to_vm(vm_id: str, ...)
+def detach_from_vm(vm_id: str, ...)
+# No create_interactive_session() without vm_id
+```
+**CLI Script Expects:**
+manager.create_interactive_session()  # No vm_id
+manager.attach_interactive_session(vm_id)
+manager.detach_interactive_session(vm_id)
+**Specification Claims:**
+manager.create_interactive_vm(vm_id)
+manager.attach_to_vm(vm_id)
+manager.detach_from_vm(vm_id)
+
+**Resolution Required:**
+- [x] Update CLI script to use correct method names and parameters
+- [ ] Optionally add aliases for CLI convenience
+
+## 4. Curator System Implementation - Status: MATCHES
+
+**Actual Implementation:**
+```python
+class Curator:
+    def curate_environment(self, profile: str = "standard") -> bool
+    def get_recommendations(self, installed_packages: List[str] = None) -> List[Package]
+    def list_installed_packages(self) -> List[Dict[str, Any]]
+```
+**CLI Script Expects:**
+curator.curate_environment(profile_name)
+curator.get_recommendations()
+curator.list_installed_packages()
+**Specification Claims:**
+Curator, get_curator, bootstrap_lua_environment, Package
+
+**Resolution Required:**
+- [x] No action needed; methods exist and match CLI/spec
+
+## 5. Interactive Session Behavior - Status: PARTIAL MATCH
+
+**Actual Implementation:**
+```python
+def read_output(self, ...)
+# No explicit load_package or interactive_loop in InteractiveSession
+# Likely implemented via send_input/read_output
+```
+**CLI Script Expects:**
+session.load_package(package_name)
+session.interactive_loop()
+**Specification Claims:**
+manager.send_input(vm_id, input_string)
+manager.read_output(vm_id)
+# load_package may use send_input internally
+
+**Resolution Required:**
+- [ ] Document that load_package and interactive_loop are not direct methods
+- [ ] Update CLI/spec to clarify usage via send_input/read_output
+
+## 6. Package Management Architecture - Status: PARTIAL MATCH
+
+**Actual Implementation:**
+- No pkgdict module or ALL_PACKAGES/BIOXEN_PACKAGES constants found
+- EnvironmentManager exists in env.py
+- Package profiles and catalogs managed via Curator/EnvironmentManager
+**CLI Script Expects:**
+from pkgdict.bioxen_packages import ALL_PACKAGES, BIOXEN_PACKAGES
+from pkgdict.bioxen_profiles import ALL_PROFILES, BIOXEN_PROFILES, PROFILE_CATEGORIES
+**Specification Claims:**
+Curator, get_curator, bootstrap_lua_environment, EnvironmentManager
+
+**Resolution Required:**
+- [ ] Document real package/profile management structure
+- [ ] Update CLI/spec to remove pkgdict references
+
+## 7. Session Management Integration - Status: MATCHES
+
+**Actual Implementation:**
+```python
+manager.session_manager.list_sessions()
+manager.session_manager.terminate_session(vm_id)
+```
+**CLI Script Expects:**
+sessions = manager.session_manager.list_sessions()
+session_manager = manager.session_manager
+session_manager.terminate_session(vm_id)
+**Specification Claims:**
+SessionManager accessible via VMManager.session_manager
+
+**Resolution Required:**
+- [x] No action needed; matches spec and CLI
 
 ---
 
-## 1. VM Creation
-- **Spec:** `create_vm(vm_id: str, networked: bool = False, persistent: bool = False, debug_mode: bool = False, lua_executable: str = "lua") -> LuaProcess`
-- **Code:**
-  - Found in `__init__.py` and `vm_manager.py`.
-  - Signature: `def create_vm(self, vm_id: str, networked: bool = False, persistent: bool = False) -> LuaProcess:`
-  - Also: `def create_vm(vm_id: str = "default", networked: bool = False, lua_executable: str = "lua", debug_mode: bool = False) -> LuaProcess:`
-- **Compliance:** Fully present. All arguments in spec are supported in code. Return type matches. `persistent` and `debug_mode` supported.
+## Priority Summary
+- **P0 - Critical:** No missing core classes or import failures
+- **P1 - High:** Method signature mismatches (VMManager, InteractiveSession, Package Management)
+- **P2 - Medium:** Feature assumptions (pkgdict, load_package, interactive_loop)
+- **P3 - Low:** Documentation/naming inconsistencies
 
-## 2. VM Manager
-- **Spec:** Class `VMManager` with methods for VM/session management.
-- **Code:**
-  - `class VMManager` in `vm_manager.py`.
-  - Methods found: `create_vm`, `execute_vm_sync`, `execute_vm_async`, `create_interactive_vm`, `attach_to_vm`, `detach_from_vm`, `terminate_vm_session`, `send_input`, `read_output`, `list_sessions`.
-- **Compliance:** All major methods present. Argument names/types match spec. Async/sync execution supported.
-
-## 3. Interactive Session
-- **Spec:** Class `InteractiveSession` with `send_input`, `read_output`, `interactive_loop`, `load_package`, `set_environment`.
-- **Code:**
-  - `class InteractiveSession` in `interactive_session.py`.
-  - Methods: `send_input`, `read_output`, `detach`, `list_sessions`, etc. `load_package` and `interactive_loop` may be implemented as part of session logic or via `send_input`.
-- **Compliance:** Core session management present. Some methods may be implemented via other mechanisms (e.g., `send_input` for package loading).
-
-## 4. Session Manager
-- **Spec:** Class `SessionManager` with `list_sessions`, `terminate_session`.
-- **Code:**
-  - `class SessionManager` in `interactive_session.py`.
-  - Methods: `list_sessions`, `terminate_session`.
-- **Compliance:** Present and matches spec.
-
-## 5. Package Management
-- **Spec:** Classes/functions for package management (Curator, PackageInstaller, etc.)
-- **Code:**
-  - `class Curator`, `def get_curator`, `def bootstrap_lua_environment` in `utils/curator.py`.
-  - `install_package` in `curator.py`, `lua_process.py`, and `cli.py`.
-  - Other classes (PackageRegistry, DependencyResolver, etc.) may be implemented as part of Curator or PackageInstaller.
-- **Compliance:** Package management classes and functions present. Some classes may be merged or implemented under different names.
-
-## 6. Exception Handling
-- **Spec:** Exception classes for session/VM errors.
-- **Code:**
-  - `class InteractiveSessionError`, `AttachError`, `DetachError`, `SessionNotFoundError`, `SessionAlreadyExistsError`, `VMManagerError`, `LuaVMError` in `exceptions.py`.
-- **Compliance:** All specified exceptions present and correctly subclassed.
-
-## 7. Logging
-- **Spec:** Class `VMLogger` for debug logging.
-- **Code:**
-  - `class VMLogger` in `logger.py`.
-- **Compliance:** Present and matches spec.
-
-## 8. Usage Patterns & Best Practices
-- **Spec:** Context manager usage, exception handling, debug mode, session lifecycle, package management, input validation.
-- **Code:**
-  - Context manager (`with VMManager() as manager:`) supported.
-  - Exception classes present.
-  - Debug mode via environment variable and logger.
-  - Session lifecycle and package management supported.
-  - Input validation and session management present.
-- **Compliance:** Matches best practices described in spec.
-
----
-
-## Summary
-- **Major components and API surface match the updated specification.**
-- **All key classes, functions, and exceptions are present.**
-- **Some classes (e.g., PackageRegistry, DependencyResolver) may be merged or implemented as part of Curator/Installer.**
-- **Method signatures and argument names are well-aligned with the spec.**
-- **Logging, error handling, and usage patterns conform to spec.**
-
-### Recommendation
-- If strict API matching is required, review for exact method names and add aliases if needed.
-- Consider documenting where spec methods are implemented via alternative mechanisms (e.g., `send_input` for package loading).
-- The codebase is compliant and ready for development and integration as described in the specification.
+## Recommendations
+- Update CLI scripts and documentation to match actual codebase method names and usage patterns
+- Remove or implement pkgdict references if needed
+- Clarify InteractiveSession usage (send_input/read_output for package loading/REPL)
+- Add method aliases for CLI convenience if desired
+- Keep specification and codebase in sync for future development
