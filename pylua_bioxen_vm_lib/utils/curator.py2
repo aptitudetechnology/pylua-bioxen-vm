@@ -42,24 +42,52 @@ class Package:
 
 class Curator:
     """Intelligent package management system for Lua environment"""
+    
+    # Curated package collections
+    CORE_PACKAGES = {
+        "lua-cjson": Package("lua-cjson", category="data", priority=9, 
+                           description="Fast JSON parsing and encoding"),
+        "luafilesystem": Package("luafilesystem", category="system", priority=8,
+                               description="File system operations"),
+        "penlight": Package("penlight", category="utility", priority=7,
+                          description="General purpose libraries extending Lua"),
+        "inspect": Package("inspect", category="debug", priority=6,
+                         description="Human-readable representation of tables"),
+    }
+    
+    NETWORKING_PACKAGES = {
+        "luasocket": Package("luasocket", category="network", priority=8,
+                           description="Network support for Lua"),
+        "http": Package("http", category="network", priority=6,
+                       description="HTTP client library"),
+    }
+    
+    PARSING_PACKAGES = {
+        "lpeg": Package("lpeg", category="parsing", priority=7,
+                       description="Parsing Expression Grammars for Lua"),
+        "lua-parser": Package("lua-parser", category="parsing", priority=5,
+                            description="Lua code parser"),
+    }
+    
+    TESTING_PACKAGES = {
+        "busted": Package("busted", category="testing", priority=6,
+                         description="Elegant Lua unit testing framework"),
+        "luassert": Package("luassert", category="testing", priority=5,
+                          description="Assertion library for Lua"),
+    }
 
-    def __init__(self, lua_path: str = None, manifest_path: str = None,
-                 packages_catalog: Dict[str, Package] = None, 
-                 profiles_catalog: Dict[str, Dict] = None):
-        """Initialize the curator with environment configuration and external catalogs
-        
-        Args:
-            lua_path: Path to Lua executable
-            manifest_path: Path to manifest file
-            packages_catalog: External package definitions (defaults to empty dict)
-            profiles_catalog: External profile definitions (defaults to empty dict)
-        """
+    def __init__(self, lua_path: str = None, manifest_path: str = None):
+        """Initialize the curator with environment configuration"""
         # Set up logging FIRST
         self.logger = self._setup_logging()
 
-        # Set up catalogs from external sources or use empty defaults
-        self.catalog = packages_catalog or {}
-        self.profiles_catalog = profiles_catalog or {}
+        # Set up catalog BEFORE loading manifest (since _load_manifest uses it)
+        self.catalog = {
+            **self.CORE_PACKAGES,
+            **self.NETWORKING_PACKAGES, 
+            **self.PARSING_PACKAGES,
+            **self.TESTING_PACKAGES
+        }
 
         # NOW we can call methods that use the logger and catalog
         self.lua_path = lua_path or self._detect_lua_path()
@@ -118,7 +146,7 @@ class Curator:
         return "lua"  # Fallback to PATH
     
     def _load_manifest(self) -> Dict[str, Any]:
-        """Load or create package manifest using external profiles"""
+        """Load or create package manifest"""
         if self.manifest_path.exists():
             try:
                 with open(self.manifest_path, 'r') as f:
@@ -128,13 +156,17 @@ class Curator:
             except Exception as e:
                 self.logger.error(f"Failed to load manifest: {e}")
         
-        # Create new manifest using external profiles or empty defaults
+        # Create new manifest
         manifest = {
             "version": "1.0",
             "created": datetime.now().isoformat(),
             "lua_version": self._get_lua_version(),
             "packages": {},
-            "profiles": dict(self.profiles_catalog)  # Use external profiles
+            "profiles": {
+                "minimal": ["lua-cjson", "luafilesystem"],
+                "standard": ["lua-cjson", "luafilesystem", "penlight", "inspect"],
+                "full": list(self.catalog.keys())
+            }
         }
         
         self._save_manifest(manifest)
@@ -262,7 +294,7 @@ class Curator:
             self.logger.error("LuaRocks is not available")
             return False
         
-        # Get package info from catalog or create minimal package info
+        # Get package info
         package = self.catalog.get(package_name)
         if not package:
             package = Package(package_name, version)
@@ -387,16 +419,11 @@ class Curator:
     
     def curate_environment(self, profile: str = "standard") -> bool:
         """Intelligently curate the environment based on profile"""
-        # Check profiles in manifest first, then fall back to external profiles catalog
-        available_profiles = self.manifest.get("profiles", {})
-        if not available_profiles:
-            available_profiles = self.profiles_catalog
-            
-        if profile not in available_profiles:
-            self.logger.error(f"Unknown profile: {profile}. Available profiles: {list(available_profiles.keys())}")
+        if profile not in self.manifest.get("profiles", {}):
+            self.logger.error(f"Unknown profile: {profile}")
             return False
         
-        packages = available_profiles[profile]
+        packages = self.manifest["profiles"][profile]
         self.logger.info(f"Curating environment with profile '{profile}': {len(packages)} packages")
         
         success_count = 0
@@ -407,21 +434,13 @@ class Curator:
         self.logger.info(f"Environment curation complete: {success_count}/{len(packages)} packages installed")
         return success_count == len(packages)
     
-    def get_available_profiles(self) -> Dict[str, List[str]]:
-        """Get all available profiles from manifest or external catalog"""
-        profiles = self.manifest.get("profiles", {})
-        if not profiles:
-            profiles = self.profiles_catalog
-        return profiles
-    
     def cleanup_orphaned_packages(self) -> List[str]:
         """Clean up packages not in any profile (orphaned packages)"""
         installed = {pkg["name"] for pkg in self.list_installed_packages()}
         
         # Get all packages in all profiles
         all_profile_packages = set()
-        available_profiles = self.get_available_profiles()
-        for packages in available_profiles.values():
+        for packages in self.manifest.get("profiles", {}).values():
             all_profile_packages.update(packages)
         
         # Find orphaned packages
@@ -443,29 +462,20 @@ class Curator:
         
         recommendations = []
         
-        # Only provide recommendations if we have a populated catalog
-        if not self.catalog:
-            self.logger.info("No package catalog available for recommendations")
-            return recommendations
-        
         # Recommend based on what's already installed
         if "lua-cjson" in installed_packages and "luasocket" not in installed_packages:
-            luasocket_pkg = self.catalog.get("luasocket")
-            if luasocket_pkg:
-                recommendations.append(luasocket_pkg)
+            recommendations.append(self.catalog.get("luasocket"))
         
         if any(pkg in installed_packages for pkg in ["busted", "luassert"]) and "inspect" not in installed_packages:
-            inspect_pkg = self.catalog.get("inspect")
-            if inspect_pkg:
-                recommendations.append(inspect_pkg)
+            recommendations.append(self.catalog.get("inspect"))
         
         # Recommend high-priority packages not yet installed
         for package in self.catalog.values():
             if package.priority >= 7 and package.name not in installed_packages:
                 recommendations.append(package)
         
-        # Sort by priority and deduplicate
-        recommendations = list(set(recommendations))
+        # Sort by priority
+        recommendations = [pkg for pkg in recommendations if pkg]
         recommendations.sort(key=lambda x: x.priority, reverse=True)
         
         return recommendations[:5]  # Top 5 recommendations
@@ -477,43 +487,27 @@ class Curator:
             "lua_version": self._get_lua_version(),
             "installed_packages": len(self.list_installed_packages()),
             "manifest_valid": self.manifest_path.exists(),
-            "catalog_size": len(self.catalog),
-            "available_profiles": len(self.get_available_profiles()),
             "timestamp": datetime.now().isoformat()
         }
         
-        # Check for critical packages (only if catalog is available)
-        if self.catalog:
-            critical_packages = [pkg for pkg in self.catalog.values() if pkg.priority >= 8]
-            critical_installed = sum(1 for pkg in critical_packages 
-                                   if self.is_package_installed(pkg.name))
-            health["critical_packages_ratio"] = f"{critical_installed}/{len(critical_packages)}"
-        else:
-            health["critical_packages_ratio"] = "N/A (no catalog)"
+        # Check for critical packages
+        critical_packages = [pkg for pkg in self.catalog.values() if pkg.priority >= 8]
+        critical_installed = sum(1 for pkg in critical_packages 
+                               if self.is_package_installed(pkg.name))
+        health["critical_packages_ratio"] = f"{critical_installed}/{len(critical_packages)}"
         
         return health
 
 
 # Convenience functions for external use
-def get_curator(lua_path: str = None, manifest_path: str = None,
-                packages_catalog: Dict[str, Package] = None, 
-                profiles_catalog: Dict[str, Dict] = None) -> Curator:
-    """Get a configured curator instance with optional external catalogs
-    
-    Args:
-        lua_path: Path to Lua executable
-        manifest_path: Path to manifest file
-        packages_catalog: External package definitions
-        profiles_catalog: External profile definitions
-    """
-    return Curator(lua_path, manifest_path, packages_catalog, profiles_catalog)
+def get_curator(lua_path: str = None, manifest_path: str = None) -> Curator:
+    """Get a configured curator instance"""
+    return Curator(lua_path, manifest_path)
 
 
-def quick_install(packages: List[str], profile: str = None, 
-                  packages_catalog: Dict[str, Package] = None, 
-                  profiles_catalog: Dict[str, Dict] = None) -> bool:
-    """Quick install packages or profile with optional external catalogs"""
-    curator = get_curator(packages_catalog=packages_catalog, profiles_catalog=profiles_catalog)
+def quick_install(packages: List[str], profile: str = None) -> bool:
+    """Quick install packages or profile"""
+    curator = get_curator()
     
     if profile:
         return curator.curate_environment(profile)
@@ -526,11 +520,9 @@ def quick_install(packages: List[str], profile: str = None,
     return success
 
 
-def bootstrap_lua_environment(profile: str = "standard", 
-                             packages_catalog: Dict[str, Package] = None, 
-                             profiles_catalog: Dict[str, Dict] = None) -> bool:
-    """Bootstrap a complete Lua environment with optional external catalogs"""
-    curator = get_curator(packages_catalog=packages_catalog, profiles_catalog=profiles_catalog)
+def bootstrap_lua_environment(profile: str = "standard") -> bool:
+    """Bootstrap a complete Lua environment"""
+    curator = get_curator()
     
     # Health check first
     health = curator.health_check()
@@ -538,12 +530,6 @@ def bootstrap_lua_environment(profile: str = "standard",
     
     if not health["luarocks_available"]:
         curator.logger.error("Cannot bootstrap: LuaRocks not available")
-        return False
-    
-    # Check if profile exists
-    available_profiles = curator.get_available_profiles()
-    if profile not in available_profiles:
-        curator.logger.error(f"Profile '{profile}' not found. Available: {list(available_profiles.keys())}")
         return False
     
     # Curate environment
@@ -559,7 +545,7 @@ def bootstrap_lua_environment(profile: str = "standard",
 
 
 if __name__ == "__main__":
-    # Demo usage - now works with empty catalogs
+    # Demo usage
     curator = get_curator()
     
     print("=== Curator Health Check ===")
@@ -574,16 +560,9 @@ if __name__ == "__main__":
     
     print("\n=== Recommendations ===")
     recommendations = curator.get_recommendations()
-    if recommendations:
-        for pkg in recommendations:
-            print(f"- {pkg.name}: {pkg.description} (priority: {pkg.priority})")
-    else:
-        print("- No recommendations available (no package catalog loaded)")
+    for pkg in recommendations:
+        print(f"- {pkg.name}: {pkg.description} (priority: {pkg.priority})")
     
     print("\n=== Available Profiles ===")
-    available_profiles = curator.get_available_profiles()
-    if available_profiles:
-        for profile, packages in available_profiles.items():
-            print(f"- {profile}: {len(packages)} packages")
-    else:
-        print("- No profiles available (no profiles catalog loaded)")
+    for profile, packages in curator.manifest.get("profiles", {}).items():
+        print(f"- {profile}: {len(packages)} packages")
