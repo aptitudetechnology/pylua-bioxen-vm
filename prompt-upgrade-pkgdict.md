@@ -12,12 +12,14 @@ Here's a prompt to update curator.py to use external package definitions:
    - `profiles_catalog: Dict[str, Dict] = None`
 4. **Use provided catalogs or fall back to empty defaults** if none provided
 5. **Update all methods** to use the dynamic catalogs instead of hardcoded ones
+6. **Update cli.py** to ensure it works with the new Curator API and dynamic profiles. Any code that manipulates or expects hardcoded profiles in the manifest should be refactored to use the injected profiles catalog.
 
 **Key changes needed:**
 - `__init__` method: Accept and store the external catalogs
 - `_load_manifest` method: Use provided profiles instead of hardcoded ones
 - All package operations should reference `self.catalog` (which comes from constructor)
 - The `get_curator()` convenience function should accept catalog parameters
+- **cli.py**: Update any logic that assumes profiles are always present in the manifest or that uses hardcoded profiles.
 
 **Important:** The pkgdict folder exists in the **consuming application**, not in the library itself. The library should be agnostic about where packages/profiles come from - they're injected via constructor parameters.
 
